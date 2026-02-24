@@ -680,6 +680,30 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 width: 100%;
             }
         }
+
+        /* Botones de rangos predefinidos */
+        .range-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-range {
+            background: white;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-range:hover {
+            background: var(--primary-color);
+            color: white;
+        }
     </style>
 </head>
 
@@ -1059,6 +1083,17 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                                 </button>
                             </div>
                         </div>
+                        
+                        <!-- Botones de rangos predefinidos -->
+                        <div class="range-buttons">
+                            <button class="btn-range" onclick="setRango('hoy')">Hoy</button>
+                            <button class="btn-range" onclick="setRango('ayer')">Ayer</button>
+                            <button class="btn-range" onclick="setRango('ultimos7')">Últimos 7 días</button>
+                            <button class="btn-range" onclick="setRango('ultimos30')">Últimos 30 días</button>
+                            <button class="btn-range" onclick="setRango('esteMes')">Este mes</button>
+                            <button class="btn-range" onclick="setRango('mesPasado')">Mes pasado</button>
+                        </div>
+
                         <div class="filter-info" id="infoRangoFechas">
                             <i class="fa fa-info-circle"></i>
                             Rango disponible: <span id="rango-min">-</span> - <span id="rango-max">-</span>
@@ -1141,9 +1176,83 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
         // Verificar API Python al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             verificarApiPython();
+            
+            // Establecer valores por defecto (últimos 30 días)
+            const hoy = new Date();
+            const hace30Dias = new Date();
+            hace30Dias.setDate(hoy.getDate() - 30);
+            
+            document.getElementById('filtro-fecha-desde').value = formatFechaInput(hace30Dias);
+            document.getElementById('filtro-fecha-hasta').value = formatFechaInput(hoy);
         });
 
-        // Función para verificar disponibilidad de la API Python
+        // Función para establecer rangos predefinidos
+        function setRango(rango) {
+            const hoy = new Date();
+            let fechaDesde, fechaHasta;
+            
+            switch(rango) {
+                case 'hoy':
+                    fechaDesde = hoy;
+                    fechaHasta = hoy;
+                    break;
+                case 'ayer':
+                    const ayer = new Date();
+                    ayer.setDate(hoy.getDate() - 1);
+                    fechaDesde = ayer;
+                    fechaHasta = ayer;
+                    break;
+                case 'ultimos7':
+                    fechaHasta = hoy;
+                    fechaDesde = new Date();
+                    fechaDesde.setDate(hoy.getDate() - 7);
+                    break;
+                case 'ultimos30':
+                    fechaHasta = hoy;
+                    fechaDesde = new Date();
+                    fechaDesde.setDate(hoy.getDate() - 30);
+                    break;
+                case 'esteMes':
+                    fechaDesde = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+                    fechaHasta = hoy;
+                    break;
+                case 'mesPasado':
+                    fechaDesde = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+                    fechaHasta = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
+                    break;
+            }
+            
+            document.getElementById('filtro-fecha-desde').value = formatFechaInput(fechaDesde);
+            document.getElementById('filtro-fecha-hasta').value = formatFechaInput(fechaHasta);
+            
+            // Aplicar filtro automáticamente
+            aplicarFiltroFecha();
+        }
+
+        // Función para formatear fecha para input type="date"
+        function formatFechaInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Función para formatear fecha con hora para enviar al backend
+        function formatFechaConHora(fecha, tipo = 'inicio') {
+            if (!fecha) return '';
+            
+            // Si ya tiene hora, devolver como está
+            if (fecha.includes(' ')) return fecha;
+            
+            // Agregar hora según el tipo
+            if (tipo === 'inicio') {
+                return `${fecha} 00:00:00`; // Para fecha desde
+            } else {
+                return `${fecha} 23:59:59`; // Para fecha hasta
+            }
+        }
+
+        // Verificar API Python al cargar la página
         function verificarApiPython() {
             fetch('http://127.0.0.1:5000/health')
                 .then(response => response.json())
@@ -1292,19 +1401,22 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
 
         // Función para aplicar filtro de fecha
         function aplicarFiltroFecha() {
-            const fechaDesde = document.getElementById('filtro-fecha-desde').value;
-            const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
-            
-            if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
-                mostrarNotificacion('La fecha "desde" no puede ser mayor que la fecha "hasta"', 'warning');
-                return;
-            }
-            
-            filtrosActuales.fecha_desde = fechaDesde;
-            filtrosActuales.fecha_hasta = fechaHasta;
-            
-            mostrarVistaPrevia(moduloActual);
-        }
+    const fechaDesde = document.getElementById('filtro-fecha-desde').value;
+    const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
+    
+    if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
+        mostrarNotificacion('La fecha "desde" no puede ser mayor que la fecha "hasta"', 'warning');
+        return;
+    }
+    
+    // Enviar SOLO la fecha (el backend ya maneja la hora)
+    filtrosActuales.fecha_desde = fechaDesde;  // SOLO YYYY-MM-DD
+    filtrosActuales.fecha_hasta = fechaHasta;  // SOLO YYYY-MM-DD
+    
+    console.log('Filtros aplicados:', filtrosActuales);
+    
+    mostrarVistaPrevia(moduloActual);
+}
 
         // Función para limpiar filtro de fecha
         function limpiarFiltroFecha() {
@@ -1334,9 +1446,23 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 if (stats.filas_filtradas_fecha > 0) {
                     statsHtml += `<span class="filter-stat-badge"><i class="fa fa-calendar-times-o"></i> ${stats.filas_filtradas_fecha} filtrados por fecha</span>`;
                 }
-                if (stats.filtros_aplicados && (stats.filtros_aplicados.fecha_desde || stats.filtros_aplicados.fecha_hasta)) {
-                    statsHtml += `<span class="filter-stat-badge"><i class="fa fa-calendar-check-o"></i> Filtro activo: ${stats.filtros_aplicados.fecha_desde || '?'} - ${stats.filtros_aplicados.fecha_hasta || '?'}</span>`;
+                
+                // Mostrar filtros activos de forma más amigable
+                if (filtrosActuales.fecha_desde || filtrosActuales.fecha_hasta) {
+                    let filtroTexto = '';
+                    if (filtrosActuales.fecha_desde && filtrosActuales.fecha_hasta) {
+                        filtroTexto = `${filtrosActuales.fecha_desde.split(' ')[0]} - ${filtrosActuales.fecha_hasta.split(' ')[0]}`;
+                    } else if (filtrosActuales.fecha_desde) {
+                        filtroTexto = `Desde ${filtrosActuales.fecha_desde.split(' ')[0]}`;
+                    } else if (filtrosActuales.fecha_hasta) {
+                        filtroTexto = `Hasta ${filtrosActuales.fecha_hasta.split(' ')[0]}`;
+                    }
+                    
+                    if (filtroTexto) {
+                        statsHtml += `<span class="filter-stat-badge"><i class="fa fa-calendar-check-o"></i> Filtro activo: ${filtroTexto}</span>`;
+                    }
                 }
+                
                 filterStats.innerHTML = statsHtml;
             }
         }
@@ -1387,11 +1513,14 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             const formData = new FormData();
             formData.append('archivo', file);
             
+            // Enviar las fechas con hora al backend
             if (filtrosActuales.fecha_desde) {
                 formData.append('fecha_desde', filtrosActuales.fecha_desde);
+                console.log('Enviando fecha_desde (con hora):', filtrosActuales.fecha_desde);
             }
             if (filtrosActuales.fecha_hasta) {
                 formData.append('fecha_hasta', filtrosActuales.fecha_hasta);
+                console.log('Enviando fecha_hasta (con hora):', filtrosActuales.fecha_hasta);
             }
             
             let controllerUrl = '';
@@ -1405,7 +1534,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             
             console.log('Enviando archivo a Python:', file.name);
             console.log('Tamaño:', (file.size / 1024 / 1024).toFixed(2), 'MB');
-            console.log('Filtros:', filtrosActuales);
             
             const startTime = Date.now();
             

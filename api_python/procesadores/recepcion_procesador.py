@@ -3,7 +3,7 @@
 
 """
 Procesador específico para el módulo de Recepción
-VERSIÓN FINAL - Con fechas sin hora y desglose de UOM en columnas
+VERSIÓN CORREGIDA - Manejo de fechas SIN HORA para filtros correctos
 """
 
 import pandas as pd
@@ -158,28 +158,19 @@ class RecepcionProcesador:
     def _procesar_fecha(self, valor):
         """
         Procesa fecha y devuelve objeto datetime para comparación
+        SOLO LA FECHA (sin hora) - EXTREMADAMENTE IMPORTANTE PARA FILTROS
         """
         try:
             if pd.isna(valor) or valor is None:
                 return None
             
-            # Si es número de Excel
-            if isinstance(valor, (int, float, np.integer, np.floating)) and valor > 40000:
-                return pd.Timestamp('1899-12-30') + pd.Timedelta(days=float(valor))
+            # Usar la función de utils que ya maneja fechas sin hora
+            fecha_formateada, fecha_iso = self.utils.convertir_fecha_excel(valor)
             
-            # Si es string
-            if isinstance(valor, str):
-                # Intentar varios formatos
-                for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M', '%Y-%m-%d', 
-                           '%d/%m/%Y %H:%M:%S', '%d/%m/%Y %H:%M', '%d/%m/%Y']:
-                    try:
-                        return datetime.strptime(valor, fmt)
-                    except:
-                        continue
-            
-            # Si ya es datetime
-            if isinstance(valor, (datetime, pd.Timestamp)):
-                return valor
+            if fecha_iso:
+                # Crear objeto datetime desde la fecha ISO (YYYY-MM-DD)
+                anio, mes, dia = map(int, fecha_iso.split('-'))
+                return datetime(anio, mes, dia)
             
             return None
             
@@ -189,7 +180,7 @@ class RecepcionProcesador:
     
     def aplicar_filtros_fecha(self, df, columna_fecha, fecha_desde, fecha_hasta):
         """
-        Aplica filtros de fecha al DataFrame
+        Aplica filtros de fecha al DataFrame - COMPARANDO SOLO FECHAS SIN HORA
         """
         stats = {
             'filas_filtradas_fecha': 0,
@@ -200,40 +191,69 @@ class RecepcionProcesador:
         if columna_fecha not in df.columns:
             return df, stats
         
-        # Crear columna con fecha ISO para filtrado
+        # Crear columna con fecha ISO para filtrado (SOLO FECHA)
         df['_FECHA_OBJ'] = None
         df['_FECHA_ISO'] = None
+        
+        # LOG PARA DEPURACIÓN
+        logger.info(f"Procesando columna de fechas: {columna_fecha}")
+        muestras = []
         
         for idx, valor in df[columna_fecha].items():
             fecha_obj = self._procesar_fecha(valor)
             if fecha_obj:
                 df.at[idx, '_FECHA_OBJ'] = fecha_obj
-                df.at[idx, '_FECHA_ISO'] = fecha_obj.strftime('%Y-%m-%d')
+                fecha_iso = fecha_obj.strftime('%Y-%m-%d')
+                df.at[idx, '_FECHA_ISO'] = fecha_iso
+                
+                # Guardar muestra para log
+                if len(muestras) < 5:
+                    muestras.append(f"{valor} -> {fecha_iso}")
                 
                 # Actualizar rango de fechas
-                fecha_iso = fecha_obj.strftime('%Y-%m-%d')
                 if stats['fecha_min'] is None or fecha_iso < stats['fecha_min']:
                     stats['fecha_min'] = fecha_iso
                 if stats['fecha_max'] is None or fecha_iso > stats['fecha_max']:
                     stats['fecha_max'] = fecha_iso
             
-            # Formatear para visualización (SOLO FECHA, SIN HORA)
+            # Formatear para visualización (SOLO FECHA)
             if fecha_obj:
                 df.at[idx, columna_fecha] = fecha_obj.strftime('%d/%m/%Y')
         
-        # Aplicar filtros
+        # LOG DE MUESTRAS
+        logger.info(f"Muestras de conversión de fechas: {muestras}")
+        logger.info(f"Rango de fechas en datos: {stats['fecha_min']} - {stats['fecha_max']}")
+        
+        # Aplicar filtros - EXTREMADAMENTE IMPORTANTE: Comparar SOLO la fecha
         if fecha_desde or fecha_hasta:
             mask = pd.Series(True, index=df.index)
             
+            # LOG DE FILTROS RECIBIDOS
+            logger.info(f"Filtros recibidos - desde: '{fecha_desde}', hasta: '{fecha_hasta}'")
+            
             if fecha_desde and '_FECHA_ISO' in df.columns:
-                mask &= (df['_FECHA_ISO'] >= fecha_desde)
+                # Extraer SOLO la fecha de fecha_desde (ignorar hora)
+                fecha_desde_sin_hora = fecha_desde.split(' ')[0] if ' ' in fecha_desde else fecha_desde
+                # Asegurar formato YYYY-MM-DD
+                if len(fecha_desde_sin_hora) == 10 and fecha_desde_sin_hora[4] == '-' and fecha_desde_sin_hora[7] == '-':
+                    mask &= (df['_FECHA_ISO'] >= fecha_desde_sin_hora)
+                    logger.info(f"Filtrando desde fecha: {fecha_desde_sin_hora}")
+                else:
+                    logger.warning(f"Formato de fecha_desde no reconocido: {fecha_desde_sin_hora}")
             
             if fecha_hasta and '_FECHA_ISO' in df.columns:
-                mask &= (df['_FECHA_ISO'] <= fecha_hasta)
+                # Extraer SOLO la fecha de fecha_hasta (ignorar hora)
+                fecha_hasta_sin_hora = fecha_hasta.split(' ')[0] if ' ' in fecha_hasta else fecha_hasta
+                # Asegurar formato YYYY-MM-DD
+                if len(fecha_hasta_sin_hora) == 10 and fecha_hasta_sin_hora[4] == '-' and fecha_hasta_sin_hora[7] == '-':
+                    mask &= (df['_FECHA_ISO'] <= fecha_hasta_sin_hora)
+                    logger.info(f"Filtrando hasta fecha: {fecha_hasta_sin_hora}")
+                else:
+                    logger.warning(f"Formato de fecha_hasta no reconocido: {fecha_hasta_sin_hora}")
             
-            # Contar filas filtradas
             stats['filas_filtradas_fecha'] = int((~mask).sum())
             df = df[mask].copy()
+            logger.info(f"Filas después de filtro fecha: {len(df)}")
         
         return df, stats
     
@@ -243,7 +263,7 @@ class RecepcionProcesador:
         """
         logger.info(f"[{request_id}] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====")
         logger.info(f"[{request_id}] Archivo: {archivo_path}")
-        logger.info(f"[{request_id}] Filtros: fecha_desde={fecha_desde}, fecha_hasta={fecha_hasta}")
+        logger.info(f"[{request_id}] Filtros recibidos: fecha_desde='{fecha_desde}', fecha_hasta='{fecha_hasta}'")
         
         try:
             # PASO 1: Leer el archivo Excel para obtener todas las hojas
@@ -330,10 +350,21 @@ class RecepcionProcesador:
                 if len(df_resultado) > 0:
                     logger.info(f"[{request_id}] Cantidades enteras extraídas - min: {df_resultado['QTY_ENTERO'].min()}, max: {df_resultado['QTY_ENTERO'].max()}")
             
-            # PASO 8: Procesar fechas para ordenamiento
+            # PASO 8: Procesar fechas para ordenamiento y filtros
             if 'DATERECEIVED' in df_resultado.columns and len(df_resultado) > 0:
                 logger.info(f"[{request_id}] Procesando fechas...")
-                df_resultado['FECHA_OBJ'] = df_resultado['DATERECEIVED'].apply(self._procesar_fecha)
+                # Aplicar filtros de fecha (esto también formatea las fechas)
+                df_resultado, stats_fecha_temp = self.aplicar_filtros_fecha(
+                    df_resultado, 
+                    'DATERECEIVED', 
+                    fecha_desde, 
+                    fecha_hasta
+                )
+                # Guardar FECHA_OBJ para uso posterior
+                if '_FECHA_OBJ' in df_resultado.columns:
+                    df_resultado['FECHA_OBJ'] = df_resultado['_FECHA_OBJ']
+            else:
+                stats_fecha_temp = {'filas_filtradas_fecha': 0, 'fecha_min': None, 'fecha_max': None}
             
             # PASO 9: AGRUPAR POR RECEIPTKEY + SKU
             stats_agrupacion = {
@@ -359,7 +390,7 @@ class RecepcionProcesador:
                     # Determinar UOM del grupo (tomar el del primer registro)
                     uom = primer_registro['UOM'] if 'UOM' in grupo.columns else ''
                     
-                    # Encontrar la fecha más reciente
+                    # Encontrar la fecha más reciente (usando FECHA_OBJ si existe)
                     fecha_str = ''
                     if 'FECHA_OBJ' in grupo.columns:
                         # Eliminar fechas nulas
@@ -367,7 +398,7 @@ class RecepcionProcesador:
                         if len(fechas_validas) > 0:
                             # Ordenar por fecha y tomar la más reciente
                             fecha_reciente = fechas_validas.sort_values(ascending=False).iloc[0]
-                            fecha_str = fecha_reciente.strftime('%d/%m/%Y')
+                            fecha_str = fecha_reciente.strftime('%d/%m/%Y')  # SIN HORA
                         else:
                             fecha_str = grupo['DATERECEIVED'].iloc[0] if 'DATERECEIVED' in grupo.columns else ''
                     
@@ -425,33 +456,7 @@ class RecepcionProcesador:
                     'reduccion': 0
                 }
             
-            # PASO 10: Aplicar filtros de fecha (después de agrupar)
-            stats_fecha = {'filas_filtradas_fecha': 0, 'fecha_min': None, 'fecha_max': None}
-            
-            if len(df_agrupado) > 0 and (fecha_desde or fecha_hasta):
-                # Necesitamos fechas en formato ISO para filtrar
-                df_agrupado['_FECHA_ISO_FILTRO'] = None
-                for idx, row in df_agrupado.iterrows():
-                    fecha_val = row['DATERECEIVED']
-                    if fecha_val and isinstance(fecha_val, str) and fecha_val.strip():
-                        # Intentar convertir la fecha ya formateada de vuelta a objeto
-                        try:
-                            fecha_obj = datetime.strptime(str(fecha_val), '%d/%m/%Y')
-                            df_agrupado.at[idx, '_FECHA_ISO_FILTRO'] = fecha_obj.strftime('%Y-%m-%d')
-                        except:
-                            pass
-                
-                # Aplicar filtros
-                mask_fecha = pd.Series(True, index=df_agrupado.index)
-                if fecha_desde:
-                    mask_fecha &= (df_agrupado['_FECHA_ISO_FILTRO'] >= fecha_desde)
-                if fecha_hasta:
-                    mask_fecha &= (df_agrupado['_FECHA_ISO_FILTRO'] <= fecha_hasta)
-                
-                stats_fecha['filas_filtradas_fecha'] = int((~mask_fecha).sum())
-                df_agrupado = df_agrupado[mask_fecha].copy()
-            
-            # PASO 11: Calcular estadísticas finales
+            # PASO 10: Calcular estadísticas finales
             total_registros_final = int(len(df_agrupado)) if len(df_agrupado) > 0 else 0
             
             # Calcular totales por tipo de UOM
@@ -471,12 +476,12 @@ class RecepcionProcesador:
                 'filas_agrupadas': int(stats_agrupacion['filas_agrupadas']),
                 'reduccion_agrupacion': int(stats_agrupacion['reduccion']),
                 'filas_filtradas_status': int(filas_filtradas_status),
-                'filas_filtradas_fecha': int(stats_fecha['filas_filtradas_fecha']),
-                'fecha_min': self._convertir_a_serializable(stats_fecha['fecha_min']),
-                'fecha_max': self._convertir_a_serializable(stats_fecha['fecha_max']),
+                'filas_filtradas_fecha': int(stats_fecha_temp['filas_filtradas_fecha']),
+                'fecha_min': self._convertir_a_serializable(stats_fecha_temp['fecha_min']),
+                'fecha_max': self._convertir_a_serializable(stats_fecha_temp['fecha_max']),
                 'filtros_aplicados': {
-                    'fecha_desde': self._convertir_a_serializable(fecha_desde),
-                    'fecha_hasta': self._convertir_a_serializable(fecha_hasta)
+                    'fecha_desde': self._convertir_a_serializable(fecha_desde.split(' ')[0] if fecha_desde and ' ' in fecha_desde else fecha_desde),
+                    'fecha_hasta': self._convertir_a_serializable(fecha_hasta.split(' ')[0] if fecha_hasta and ' ' in fecha_hasta else fecha_hasta)
                 },
                 'hoja_procesada': str(hoja_detail),
                 'total_unidades': self._convertir_a_serializable(total_unidades),
@@ -501,7 +506,7 @@ class RecepcionProcesador:
             logger.info(f"[{request_id}]   - Total CAJAS: {stats['total_cajas']}")
             logger.info(f"[{request_id}]   - Total PALLETS: {stats['total_pallets']}")
             
-            # PASO 12: Preparar datos para vista previa
+            # PASO 11: Preparar datos para vista previa
             if len(df_agrupado) > 0:
                 columnas_existentes = [col for col in self.HEADERS_MOSTRAR if col in df_agrupado.columns]
                 
@@ -517,7 +522,7 @@ class RecepcionProcesador:
                 datos_preview = []
                 columnas_existentes = self.HEADERS_MOSTRAR
             
-            # PASO 13: Generar mensajes
+            # PASO 12: Generar mensajes
             mensajes = {
                 'mensaje_hoja': f"Datos extraídos de la hoja: '{hoja_detail}'",
                 'mensaje_agrupacion': f"Se agruparon {stats['filas_originales']} registros en {stats['filas_agrupadas']} grupos (reducción de {stats['reduccion_agrupacion']} filas)"
