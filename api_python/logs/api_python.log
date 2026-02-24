@@ -1,0 +1,977 @@
+2026-02-24 14:54:25,491 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-24 14:54:25,492 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 14:54:25,495 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 14:54:26,623 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 14:54:26,640 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 14:55:13,598 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 14:55:13] "GET /health HTTP/1.1" 200 -
+2026-02-24 14:55:13,630 - __main__ - INFO - [20260224_145513_630816] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 14:55:13,910 - __main__ - INFO - [20260224_145513_630816] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_145513_630816_Export (48).xlsx (3111608 bytes)
+2026-02-24 14:55:13,910 - __main__ - INFO - [20260224_145513_630816] Filtros: desde=, hasta=
+2026-02-24 14:55:13,911 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Iniciando procesamiento recepción
+2026-02-24 14:55:14,378 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Columnas encontradas: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'STORERKEY', 'WAREHOUSEREFERENCE', 'EXPECTEDRECEIPTDATE', 'EXTERNRECEIPTKEY', 'POKEY', 'CARRIERNAME', 'CARRIERREFERENCE', 'CONTAINERKEY', 'RECEIPTDATE', 'STATUS', 'TYPE', 'CLOSEDDATE', 'VERIFIEDCLOSEDDATE', 'EARLIESTSHIPDATE', 'REQUIREDSHIPDATE', 'ScheduledShipDate', 'ActualShipDate', 'EARLIESTDELIVERYDATE', 'REQUIREDDELIVERYDATE', 'ArrivalDateTime', 'ACTUALDEPARTUREDATE', 'DOOR', 'APPOINTMENTKEY', 'EFFECTIVEDATE', 'EXTERNALRECEIPTKEY2', 'GrossWeight', 'TotalVolume', 'TRANSPORTATIONSTATUS', 'ADVICEDATE', 'ADVICENUMBER', 'ALLOWAUTORECEIPT', 'PACKINGSLIPNUMBER', 'RMA', 'SUSR1', 'SUSR2', 'SUSR3', 'SUSR4', 'SUSR5', 'TRACKINVENTORYBY', 'ShipFromAddressLine1', 'ShipFromAddressLine2', 'ShipFromAddressLine3', 'ShipFromAddressLine4', 'SHIPFROMADDRESSLINE5', 'SHIPFROMADDRESSLINE6', 'ShipFromCity', 'ShipFromContact', 'ShipFromEmail', 'ShipFromISOCountry', 'ShipFromPhone', 'ShipFromState', 'ShipFromZip', 'SupplierCode', 'SupplierName', 'CARRIERADDRESS1', 'CARRIERADDRESS2', 'CARRIERCITY', 'CarrierCountry', 'CARRIERKEY', 'CarrierPhone', 'CARRIERSTATE', 'CARRIERZIP', 'DriverName', 'TRAILERKEY', 'TrailerNumber', 'TrailerOwner', 'TrailerType', 'VEHICLENUMBER', 'VEHICLEDATE', 'TEMPERATURE', 'CONTAINERQTY', 'CONTAINERTYPE', 'PRONUMBER', 'DESTINATIONCOUNTRY', 'INCOTERMS', 'NOTES', 'ORIGINCOUNTRY', 'PLACEOFDELIVERY', 'PLACEOFDISCHARGE', 'PLACEOFLOADING', 'TERMSNOTE', 'TRANSPORTATIONMODE', 'TRANSPORTATIONSERVICE', 'CARRIERROUTESTATUS', 'FREIGHTCHARGEAMOUNT', 'TMFREIGHTCHARGECURRENCY', 'FREIGHTCOSTAMOUNT', 'TMFREIGHTCOSTCURRENCY', 'ADDDATE', 'ADDWHO', 'EDITDATE', 'EDITWHO', 'SOURCELOCATION', 'SOURCEVERSION', 'REFERENCETYPE', 'REFERENCEDOCUMENT', 'REFERENCELOCATION', 'REFERENCEVERSION', 'USERAINBOW', 'EXT_UDF_STR1', 'EXT_UDF_STR2', 'EXT_UDF_STR3', 'EXT_UDF_STR4', 'EXT_UDF_STR5', 'EXT_UDF_STR6', 'EXT_UDF_STR7', 'EXT_UDF_STR8', 'EXT_UDF_STR9', 'EXT_UDF_STR10', 'EXT_UDF_STR11', 'EXT_UDF_STR12', 'EXT_UDF_STR13', 'EXT_UDF_STR14', 'EXT_UDF_STR15', 'EXT_UDF_DATE1', 'EXT_UDF_DATE2', 'EXT_UDF_DATE3', 'EXT_UDF_DATE4', 'EXT_UDF_DATE5', 'EXT_UDF_FLOAT1', 'EXT_UDF_FLOAT2', 'EXT_UDF_FLOAT3', 'EXT_UDF_FLOAT4', 'EXT_UDF_FLOAT5', 'EXT_UDF_LKUP1', 'EXT_UDF_LKUP2', 'EXT_UDF_LKUP3', 'EXT_UDF_LKUP4', 'EXT_UDF_LKUP5', 'EXT_UDF_LKUP6', 'EXT_UDF_LKUP7', 'EXT_UDF_LKUP8', 'EXT_UDF_LKUP9', 'EXT_UDF_LKUP10', 'EXT_UDF_POPUP1', 'EXT_UDF_POPUP2', 'EXT_UDF_POPUP3', 'EXT_UDF_POPUP4', 'EXT_UDF_POPUP5', 'EXT_UDF_POPUP6', 'EXT_UDF_POPUP7', 'EXT_UDF_POPUP8', 'EXT_UDF_POPUP9', 'EXT_UDF_POPUP10']
+2026-02-24 14:55:14,397 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 14:55:14,397 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Leyendo archivo completo...
+2026-02-24 14:55:28,754 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Archivo leído: 5920 filas, 148 columnas
+2026-02-24 14:55:28,755 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Usando nombres de columna
+2026-02-24 14:55:28,756 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] RECEIPTKEY encontrada en columna 2: RECEIPTKEY
+2026-02-24 14:55:28,756 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] SKU encontrada en columna 3: SKU
+2026-02-24 14:55:28,757 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] STORERKEY encontrada en columna 4: STORERKEY
+2026-02-24 14:55:28,758 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] RECEIPTLINENUMBER encontrada en columna 5: RECEIPTLINENUMBER
+2026-02-24 14:55:28,758 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] QTYRECEIVED encontrada en columna 7: QTYRECEIVED
+2026-02-24 14:55:28,758 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] UOM encontrada en columna 8: UOM
+2026-02-24 14:55:28,759 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] STATUS encontrada en columna 14: STATUS
+2026-02-24 14:55:28,760 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] DATERECEIVED encontrada en columna 33: DATERECEIVED
+2026-02-24 14:55:28,765 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] DataFrame creado con 8 columnas
+2026-02-24 14:55:28,796 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Filas con cantidad cero: 1807
+2026-02-24 14:55:29,241 - procesadores.recepcion_procesador - INFO - [20260224_145513_630816] Procesamiento exitoso: 4113 registros finales
+2026-02-24 14:55:29,248 - __main__ - INFO - [20260224_145513_630816] Procesamiento completado en 15.62 segundos
+2026-02-24 14:55:29,249 - __main__ - WARNING - [20260224_145513_630816] No se pudo eliminar archivo temporal: [WinError 32] El proceso no tiene acceso al archivo porque está siendo utilizado por otro proceso: 'C:\\Users\\JOHNAR~1\\AppData\\Local\\Temp\\20260224_145513_630816_Export (48).xlsx'
+2026-02-24 14:55:29,270 - __main__ - ERROR - [20260224_145513_630816] ERROR: Object of type int64 is not JSON serializable
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 159, in procesar_archivo
+    return jsonify(resultado)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type int64 is not JSON serializable
+
+2026-02-24 14:55:29,368 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 14:55:29] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 14:57:07,863 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 14:57:08,151 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 14:57:11,482 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 14:57:11,494 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 14:57:19,642 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\utils\\excel_utils.py', reloading
+2026-02-24 14:57:19,804 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 14:57:36,490 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-24 14:57:36,491 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 14:57:36,495 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 14:57:38,282 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 14:57:38,295 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 14:57:56,669 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 14:57:56] "GET /health HTTP/1.1" 200 -
+2026-02-24 14:57:56,681 - __main__ - INFO - [20260224_145756_681088] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 14:57:56,888 - __main__ - INFO - [20260224_145756_681088] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_145756_681088_Export (48).xlsx (3111608 bytes)
+2026-02-24 14:57:56,889 - __main__ - INFO - [20260224_145756_681088] Filtros: desde=, hasta=
+2026-02-24 14:57:56,889 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] Iniciando procesamiento recepción
+2026-02-24 14:57:56,889 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] Leyendo archivo...
+2026-02-24 14:57:57,664 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] Archivo leído: 88 filas, 147 columnas
+2026-02-24 14:57:57,665 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] Usando posiciones de columna
+2026-02-24 14:57:57,666 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] RECEIPTKEY en columna C (índice 2)
+2026-02-24 14:57:57,667 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] SKU en columna D (índice 3)
+2026-02-24 14:57:57,667 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] STORERKEY en columna E (índice 4)
+2026-02-24 14:57:57,668 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] RECEIPTLINENUMBER en columna F (índice 5)
+2026-02-24 14:57:57,668 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] QTYRECEIVED en columna H (índice 7)
+2026-02-24 14:57:57,669 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] UOM en columna I (índice 8)
+2026-02-24 14:57:57,669 - procesadores.recepcion_procesador - INFO - [20260224_145756_681088] STATUS en columna O (índice 14)
+2026-02-24 14:57:57,670 - procesadores.recepcion_procesador - ERROR - [20260224_145756_681088] Error en procesamiento: ord() expected a character, but string of length 2 found
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\procesadores\recepcion_procesador.py", line 154, in procesar
+    indice = ord(letra.upper()) - ord('A')
+             ^^^^^^^^^^^^^^^^^^
+TypeError: ord() expected a character, but string of length 2 found
+2026-02-24 14:57:57,673 - __main__ - ERROR - [20260224_145756_681088] ERROR: ord() expected a character, but string of length 2 found
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 133, in procesar_archivo
+    resultado = procesador.procesar(
+                ^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\procesadores\recepcion_procesador.py", line 154, in procesar
+    indice = ord(letra.upper()) - ord('A')
+             ^^^^^^^^^^^^^^^^^^
+TypeError: ord() expected a character, but string of length 2 found
+
+2026-02-24 14:57:57,792 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 14:57:57] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 14:58:38,088 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\utils\\excel_utils.py', reloading
+2026-02-24 14:58:38,230 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:00:35,258 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:00:35,260 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:00:35,312 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-24 15:00:35,313 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 15:00:35,315 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:00:36,734 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:00:36,737 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:00:36,874 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:00:36,889 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:00:48,978 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:00:48] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:00:48,987 - __main__ - INFO - [20260224_150048_987186] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:00:49,236 - __main__ - INFO - [20260224_150048_987186] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_150048_987186_Export (48).xlsx (3111608 bytes)
+2026-02-24 15:00:49,236 - __main__ - INFO - [20260224_150048_987186] Filtros: desde=, hasta=
+2026-02-24 15:00:49,237 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] Iniciando procesamiento recepción
+2026-02-24 15:00:49,237 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] Leyendo archivo...
+2026-02-24 15:00:49,880 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] Archivo leído: 88 filas, 147 columnas
+2026-02-24 15:00:49,880 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] Mapeando columnas Excel a índices...
+2026-02-24 15:00:49,881 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] RECEIPTKEY en columna C (índice 2)
+2026-02-24 15:00:49,881 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] SKU en columna D (índice 3)
+2026-02-24 15:00:49,882 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] STORERKEY en columna E (índice 4)
+2026-02-24 15:00:49,882 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] RECEIPTLINENUMBER en columna F (índice 5)
+2026-02-24 15:00:49,883 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] QTYRECEIVED en columna H (índice 7)
+2026-02-24 15:00:49,883 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] UOM en columna I (índice 8)
+2026-02-24 15:00:49,884 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] STATUS en columna O (índice 14)
+2026-02-24 15:00:49,884 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] DATERECEIVED en columna AH (índice 33)
+2026-02-24 15:00:49,888 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] DataFrame creado con 8 columnas
+2026-02-24 15:00:49,893 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] Filas con cantidad cero: 15
+2026-02-24 15:00:49,911 - procesadores.recepcion_procesador - INFO - [20260224_150048_987186] Procesamiento exitoso: 73 registros finales
+2026-02-24 15:00:49,912 - __main__ - INFO - [20260224_150048_987186] Procesamiento completado en 0.92 segundos
+2026-02-24 15:00:50,438 - __main__ - INFO - [20260224_150048_987186] Archivo temporal eliminado
+2026-02-24 15:00:50,438 - __main__ - INFO - [20260224_150048_987186] Enviando respuesta JSON exitosamente
+2026-02-24 15:00:50,518 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:00:50] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:08:56,284 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:08:56] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:08:56,294 - __main__ - INFO - [20260224_150856_294992] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:08:56,592 - __main__ - INFO - [20260224_150856_294992] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_150856_294992_Export (48).xlsx (3258692 bytes)
+2026-02-24 15:08:56,593 - __main__ - INFO - [20260224_150856_294992] Filtros: desde=, hasta=
+2026-02-24 15:08:56,594 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] Iniciando procesamiento recepción
+2026-02-24 15:08:56,594 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] Leyendo archivo...
+2026-02-24 15:08:57,102 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] Archivo leído: 88 filas, 147 columnas
+2026-02-24 15:08:57,104 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] Mapeando columnas Excel a índices...
+2026-02-24 15:08:57,104 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] RECEIPTKEY en columna C (índice 2)
+2026-02-24 15:08:57,105 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] SKU en columna D (índice 3)
+2026-02-24 15:08:57,106 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] STORERKEY en columna E (índice 4)
+2026-02-24 15:08:57,106 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] RECEIPTLINENUMBER en columna F (índice 5)
+2026-02-24 15:08:57,107 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] QTYRECEIVED en columna H (índice 7)
+2026-02-24 15:08:57,108 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] UOM en columna I (índice 8)
+2026-02-24 15:08:57,109 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] STATUS en columna O (índice 14)
+2026-02-24 15:08:57,110 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] DATERECEIVED en columna AH (índice 33)
+2026-02-24 15:08:57,119 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] DataFrame creado con 8 columnas
+2026-02-24 15:08:57,124 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] Filas con cantidad cero: 15
+2026-02-24 15:08:57,155 - procesadores.recepcion_procesador - INFO - [20260224_150856_294992] Procesamiento exitoso: 73 registros finales
+2026-02-24 15:08:57,158 - __main__ - INFO - [20260224_150856_294992] Procesamiento completado en 0.86 segundos
+2026-02-24 15:08:57,702 - __main__ - INFO - [20260224_150856_294992] Archivo temporal eliminado
+2026-02-24 15:08:57,703 - __main__ - INFO - [20260224_150856_294992] Enviando respuesta JSON exitosamente
+2026-02-24 15:08:57,822 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:08:57] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:12:45,502 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:12:45] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:12:45,509 - __main__ - INFO - [20260224_151245_509684] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:12:45,657 - __main__ - INFO - [20260224_151245_509684] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_151245_509684_Export (48).xlsx (3258500 bytes)
+2026-02-24 15:12:45,658 - __main__ - INFO - [20260224_151245_509684] Filtros: desde=, hasta=
+2026-02-24 15:12:45,658 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] Iniciando procesamiento recepción
+2026-02-24 15:12:45,658 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] Leyendo archivo...
+2026-02-24 15:12:45,972 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] Archivo leído: 88 filas, 147 columnas
+2026-02-24 15:12:45,973 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] Mapeando columnas Excel a índices...
+2026-02-24 15:12:45,973 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] RECEIPTKEY en columna C (índice 2)
+2026-02-24 15:12:45,974 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] SKU en columna D (índice 3)
+2026-02-24 15:12:45,974 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] STORERKEY en columna E (índice 4)
+2026-02-24 15:12:45,974 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] RECEIPTLINENUMBER en columna F (índice 5)
+2026-02-24 15:12:45,974 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] QTYRECEIVED en columna H (índice 7)
+2026-02-24 15:12:45,975 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] UOM en columna I (índice 8)
+2026-02-24 15:12:45,975 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] STATUS en columna O (índice 14)
+2026-02-24 15:12:45,976 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] DATERECEIVED en columna AH (índice 33)
+2026-02-24 15:12:45,979 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] DataFrame creado con 8 columnas
+2026-02-24 15:12:45,983 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] Filas con cantidad cero: 15
+2026-02-24 15:12:45,996 - procesadores.recepcion_procesador - INFO - [20260224_151245_509684] Procesamiento exitoso: 73 registros finales
+2026-02-24 15:12:45,997 - __main__ - INFO - [20260224_151245_509684] Procesamiento completado en 0.49 segundos
+2026-02-24 15:12:46,532 - __main__ - INFO - [20260224_151245_509684] Archivo temporal eliminado
+2026-02-24 15:12:46,533 - __main__ - INFO - [20260224_151245_509684] Enviando respuesta JSON exitosamente
+2026-02-24 15:12:46,610 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:12:46] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:18:38,670 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:18:38,822 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:18:40,603 - __main__ - ERROR - Error importando procesadores: cannot import name 'RecepcionProcesador' from 'procesadores.recepcion_procesador' (C:\xampp\htdocs\Portal-Facturacion\api_python\procesadores\recepcion_procesador.py)
+2026-02-24 15:28:52,298 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:28:52,299 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:28:52,374 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-24 15:28:52,374 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 15:28:52,379 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:28:53,526 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:28:53,530 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:28:53,607 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:28:53,623 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:28:59,610 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:28:59] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:29:10,325 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:29:10] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:29:10,338 - __main__ - INFO - [20260224_152910_338695] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:29:10,472 - __main__ - INFO - [20260224_152910_338695] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_152910_338695_Export (50).xlsx (1454600 bytes)
+2026-02-24 15:29:10,473 - __main__ - INFO - [20260224_152910_338695] Filtros: desde=, hasta=
+2026-02-24 15:29:10,473 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Iniciando procesamiento recepción
+2026-02-24 15:29:10,475 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Leyendo archivo...
+2026-02-24 15:29:11,037 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Archivo leído: 35 filas, 147 columnas
+2026-02-24 15:29:11,038 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'STORERKEY', 'WAREHOUSEREFERENCE', 'EXPECTEDRECEIPTDATE', 'EXTERNRECEIPTKEY', 'POKEY', 'CARRIERNAME', 'CARRIERREFERENCE']
+2026-02-24 15:29:11,039 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Mapeando columnas Excel a índices...
+2026-02-24 15:29:11,039 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] RECEIPTKEY en columna A (índice 0)
+2026-02-24 15:29:11,039 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] SKU en columna B (índice 1)
+2026-02-24 15:29:11,040 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] STORERKEY en columna C (índice 2)
+2026-02-24 15:29:11,040 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] QTYRECEIVED en columna E (índice 4)
+2026-02-24 15:29:11,041 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] UOM en columna F (índice 5)
+2026-02-24 15:29:11,041 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] STATUS en columna G (índice 6)
+2026-02-24 15:29:11,041 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] DATERECEIVED en columna H (índice 7)
+2026-02-24 15:29:11,042 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] EXTERNRECEIPTKEY en columna I (índice 8)
+2026-02-24 15:29:11,045 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] DataFrame creado con 8 columnas
+2026-02-24 15:29:11,046 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Columnas en resultado: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:29:11,050 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Rango de cantidades: min=0.0, max=0.0
+2026-02-24 15:29:11,066 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Procesamiento exitoso: 35 registros finales
+2026-02-24 15:29:11,066 - procesadores.recepcion_procesador - INFO - [20260224_152910_338695] Vista previa: 35 filas
+2026-02-24 15:29:11,067 - __main__ - INFO - [20260224_152910_338695] Procesamiento completado en 0.73 segundos
+2026-02-24 15:29:11,590 - __main__ - INFO - [20260224_152910_338695] Archivo temporal eliminado
+2026-02-24 15:29:11,591 - __main__ - INFO - [20260224_152910_338695] Enviando respuesta JSON exitosamente
+2026-02-24 15:29:11,636 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:29:11] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:29:49,215 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:29:49,356 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:29:51,197 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:29:51,201 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:29:51,258 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:29:51,266 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:29:52,774 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:29:52,924 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:29:55,389 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:29:55,393 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:29:55,451 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:29:55,464 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:00,141 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:30:00,332 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:30:02,185 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:30:02,188 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:30:02,330 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:30:02,350 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:08,226 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:30:08,431 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:30:09,820 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:30:09,823 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:30:09,855 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:30:09,863 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:12,246 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:30:12,379 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:30:14,490 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:30:14,493 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:30:14,540 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:30:14,550 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:18,104 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:30:18,193 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:30:20,035 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:30:20,040 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:30:20,092 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:30:20,098 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:22,635 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:30:22,734 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:30:24,080 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:30:24,083 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:30:24,141 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:30:24,150 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:27,807 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:30:27,947 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:30:29,843 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:30:29,846 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:30:29,889 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:30:29,898 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:32,396 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:30:32,531 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:30:34,931 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:30:34,936 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:30:34,993 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:30:35,006 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:30:38,128 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:30:38] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:30:46,604 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:30:46] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:30:46,611 - __main__ - INFO - [20260224_153046_611276] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:30:46,702 - __main__ - INFO - [20260224_153046_611276] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_153046_611276_Export (50).xlsx (1454600 bytes)
+2026-02-24 15:30:46,703 - __main__ - INFO - [20260224_153046_611276] Filtros: desde=, hasta=
+2026-02-24 15:30:46,703 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Iniciando procesamiento recepción
+2026-02-24 15:30:46,703 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Leyendo archivo...
+2026-02-24 15:30:47,109 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Archivo leído: 35 filas, 147 columnas
+2026-02-24 15:30:47,110 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'STORERKEY', 'WAREHOUSEREFERENCE', 'EXPECTEDRECEIPTDATE', 'EXTERNRECEIPTKEY', 'POKEY', 'CARRIERNAME', 'CARRIERREFERENCE']
+2026-02-24 15:30:47,111 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Mapeando columnas Excel a índices...
+2026-02-24 15:30:47,111 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] RECEIPTKEY en columna C (índice 2)
+2026-02-24 15:30:47,112 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] SKU en columna D (índice 3)
+2026-02-24 15:30:47,112 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] STORERKEY en columna E (índice 4)
+2026-02-24 15:30:47,112 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] QTYRECEIVED en columna H (índice 7)
+2026-02-24 15:30:47,113 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] UOM en columna I (índice 8)
+2026-02-24 15:30:47,113 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] STATUS en columna O (índice 14)
+2026-02-24 15:30:47,114 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] DATERECEIVED en columna AH (índice 33)
+2026-02-24 15:30:47,114 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] EXTERNRECEIPTKEY en columna AN (índice 39)
+2026-02-24 15:30:47,118 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] DataFrame creado con 8 columnas
+2026-02-24 15:30:47,119 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Columnas en resultado: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:30:47,125 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Rango de cantidades: min=0.0, max=11404852.0
+2026-02-24 15:30:47,143 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Procesamiento exitoso: 35 registros finales
+2026-02-24 15:30:47,145 - procesadores.recepcion_procesador - INFO - [20260224_153046_611276] Vista previa: 35 filas
+2026-02-24 15:30:47,146 - __main__ - INFO - [20260224_153046_611276] Procesamiento completado en 0.54 segundos
+2026-02-24 15:30:47,674 - __main__ - INFO - [20260224_153046_611276] Archivo temporal eliminado
+2026-02-24 15:30:47,675 - __main__ - INFO - [20260224_153046_611276] Enviando respuesta JSON exitosamente
+2026-02-24 15:30:47,713 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:30:47] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:35:31,812 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:35:31,999 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:35:35,247 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:35:35,253 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:35:35,317 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:35:35,331 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:35:42,484 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:35:42,719 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:35:45,613 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:35:45,618 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:35:45,698 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:35:45,715 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:35:53,432 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:35:53] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:38:59,677 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:38:59] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:39:07,085 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:39:07] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:39:07,094 - __main__ - INFO - [20260224_153907_093099] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:39:07,311 - __main__ - INFO - [20260224_153907_093099] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_153907_093099_Export (51).xlsx (3378917 bytes)
+2026-02-24 15:39:07,311 - __main__ - INFO - [20260224_153907_093099] Filtros: desde=, hasta=
+2026-02-24 15:39:07,312 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 15:39:07,312 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_153907_093099_Export (51).xlsx
+2026-02-24 15:39:07,312 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Leyendo archivo Excel para obtener hojas...
+2026-02-24 15:39:07,663 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Hojas disponibles en el archivo: ['Data', 'Detail', 'Validations']
+2026-02-24 15:39:07,692 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Hoja seleccionada para procesar: 'Detail'
+2026-02-24 15:39:07,692 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Leyendo hoja 'Detail'...
+2026-02-24 15:39:28,040 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Hoja leída: 6418 filas, 148 columnas
+2026-02-24 15:39:28,041 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'SKU', 'STORERKEY', 'RECEIPTLINENUMBER', 'QTYEXPECTED', 'QTYRECEIVED', 'UOM', 'PACKKEY']
+2026-02-24 15:39:28,042 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Mapeando columnas Excel a índices...
+2026-02-24 15:39:28,107 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Columnas extraídas: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:39:28,108 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] DataFrame creado con 8 columnas
+2026-02-24 15:39:28,116 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Después de limpiar: 6418 filas
+2026-02-24 15:39:28,124 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] STATUS procesado
+2026-02-24 15:39:28,141 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Cantidades: 0 positivas, 6418 cero
+2026-02-24 15:39:29,675 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Fechas procesadas. Rango: None - None
+2026-02-24 15:39:29,698 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Procesamiento exitoso: 6418 registros finales
+2026-02-24 15:39:29,699 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Vista previa: 100 filas
+2026-02-24 15:39:29,699 - procesadores.recepcion_procesador - INFO - [20260224_153907_093099] Hoja usada: 'Detail'
+2026-02-24 15:39:29,707 - __main__ - INFO - [20260224_153907_093099] Procesamiento completado en 22.61 segundos
+2026-02-24 15:39:30,253 - __main__ - INFO - [20260224_153907_093099] Archivo temporal eliminado
+2026-02-24 15:39:30,253 - __main__ - INFO - [20260224_153907_093099] Enviando respuesta JSON exitosamente
+2026-02-24 15:39:30,365 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:39:30] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:43:41,625 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:43:41,852 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:43:44,143 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:43:44,157 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:43:44,240 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:43:44,254 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:43:46,573 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:43:46,665 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:43:48,660 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:43:48,666 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:43:48,820 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:43:48,837 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:43:51,658 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:43:51,795 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:43:54,304 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:43:54,309 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:43:54,369 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:43:54,382 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:43:58,201 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:43:58,389 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:44:00,477 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:44:00,482 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:44:00,551 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:44:00,566 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:44:02,400 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:44:02,689 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:44:06,302 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:44:06,308 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:44:06,376 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:44:06,389 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:44:22,121 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:44:22,300 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:44:23,998 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:44:24,001 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:44:24,029 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:44:24,036 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:44:27,420 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:44:27,543 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:44:30,219 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:44:30,227 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:44:30,290 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:44:30,305 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:44:32,018 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 15:44:32,164 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 15:44:34,623 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 15:44:34,630 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 15:44:34,802 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 15:44:34,824 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 15:44:35,117 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:44:35] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:44:35,131 - __main__ - INFO - [20260224_154435_131368] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:44:35,496 - __main__ - INFO - [20260224_154435_131368] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154435_131368_Export (51).xlsx (3378917 bytes)
+2026-02-24 15:44:35,498 - __main__ - INFO - [20260224_154435_131368] Filtros: desde=, hasta=
+2026-02-24 15:44:35,499 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 15:44:35,500 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154435_131368_Export (51).xlsx
+2026-02-24 15:44:35,502 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Leyendo archivo Excel para obtener hojas...
+2026-02-24 15:44:36,454 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Hojas disponibles en el archivo: ['Data', 'Detail', 'Validations']
+2026-02-24 15:44:36,492 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Hoja seleccionada para procesar: 'Detail'
+2026-02-24 15:44:36,494 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Leyendo hoja 'Detail'...
+2026-02-24 15:45:01,337 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Hoja leída: 6418 filas, 148 columnas
+2026-02-24 15:45:01,338 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'SKU', 'STORERKEY', 'RECEIPTLINENUMBER', 'QTYEXPECTED', 'QTYRECEIVED', 'UOM', 'PACKKEY']
+2026-02-24 15:45:01,338 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Mapeando columnas Excel a índices...
+2026-02-24 15:45:01,412 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Columnas extraídas: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:45:01,413 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] DataFrame creado con 8 columnas
+2026-02-24 15:45:01,422 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Después de limpiar: 6418 filas
+2026-02-24 15:45:01,429 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] STATUS procesado
+2026-02-24 15:45:01,454 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Cantidades: 5078 positivas, 1340 cero
+2026-02-24 15:45:03,225 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Fechas procesadas. Rango: None - None
+2026-02-24 15:45:03,275 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Procesamiento exitoso: 6418 registros finales
+2026-02-24 15:45:03,276 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Vista previa: 100 filas
+2026-02-24 15:45:03,277 - procesadores.recepcion_procesador - INFO - [20260224_154435_131368] Hoja usada: 'Detail'
+2026-02-24 15:45:03,290 - __main__ - INFO - [20260224_154435_131368] Procesamiento completado en 28.16 segundos
+2026-02-24 15:45:03,822 - __main__ - INFO - [20260224_154435_131368] Archivo temporal eliminado
+2026-02-24 15:45:03,823 - __main__ - INFO - [20260224_154435_131368] Enviando respuesta JSON exitosamente
+2026-02-24 15:45:03,923 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:45:03] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:45:10,380 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:45:10] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:45:21,604 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:45:21] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:45:21,612 - __main__ - INFO - [20260224_154521_611316] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:45:21,856 - __main__ - INFO - [20260224_154521_611316] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154521_611316_Export (51).xlsx (3378917 bytes)
+2026-02-24 15:45:21,856 - __main__ - INFO - [20260224_154521_611316] Filtros: desde=, hasta=
+2026-02-24 15:45:21,857 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 15:45:21,857 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154521_611316_Export (51).xlsx
+2026-02-24 15:45:21,857 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Leyendo archivo Excel para obtener hojas...
+2026-02-24 15:45:21,882 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Hojas disponibles en el archivo: ['Data', 'Detail', 'Validations']
+2026-02-24 15:45:21,888 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Hoja seleccionada para procesar: 'Detail'
+2026-02-24 15:45:21,888 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Leyendo hoja 'Detail'...
+2026-02-24 15:45:42,930 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Hoja leída: 6418 filas, 148 columnas
+2026-02-24 15:45:42,931 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'SKU', 'STORERKEY', 'RECEIPTLINENUMBER', 'QTYEXPECTED', 'QTYRECEIVED', 'UOM', 'PACKKEY']
+2026-02-24 15:45:42,932 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Mapeando columnas Excel a índices...
+2026-02-24 15:45:43,066 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Columnas extraídas: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:45:43,067 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] DataFrame creado con 8 columnas
+2026-02-24 15:45:43,076 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Después de limpiar: 6418 filas
+2026-02-24 15:45:43,088 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] STATUS procesado
+2026-02-24 15:45:43,115 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Cantidades: 5078 positivas, 1340 cero
+2026-02-24 15:45:46,555 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Fechas procesadas. Rango: None - None
+2026-02-24 15:45:46,708 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Procesamiento exitoso: 6418 registros finales
+2026-02-24 15:45:46,710 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Vista previa: 100 filas
+2026-02-24 15:45:46,715 - procesadores.recepcion_procesador - INFO - [20260224_154521_611316] Hoja usada: 'Detail'
+2026-02-24 15:45:46,756 - __main__ - INFO - [20260224_154521_611316] Procesamiento completado en 25.14 segundos
+2026-02-24 15:45:47,427 - __main__ - INFO - [20260224_154521_611316] Archivo temporal eliminado
+2026-02-24 15:45:47,429 - __main__ - INFO - [20260224_154521_611316] Enviando respuesta JSON exitosamente
+2026-02-24 15:45:47,658 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:45:47] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:47:01,075 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:47:01] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:47:09,434 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:47:09] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:47:09,442 - __main__ - INFO - [20260224_154709_442652] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:47:09,655 - __main__ - INFO - [20260224_154709_442652] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154709_442652_Export (51).xlsx (3378917 bytes)
+2026-02-24 15:47:09,656 - __main__ - INFO - [20260224_154709_442652] Filtros: desde=, hasta=
+2026-02-24 15:47:09,657 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 15:47:09,657 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154709_442652_Export (51).xlsx
+2026-02-24 15:47:09,658 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Leyendo archivo Excel para obtener hojas...
+2026-02-24 15:47:09,681 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Hojas disponibles en el archivo: ['Data', 'Detail', 'Validations']
+2026-02-24 15:47:09,688 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Hoja seleccionada para procesar: 'Detail'
+2026-02-24 15:47:09,690 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Leyendo hoja 'Detail'...
+2026-02-24 15:47:35,940 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Hoja leída: 6418 filas, 148 columnas
+2026-02-24 15:47:35,941 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'SKU', 'STORERKEY', 'RECEIPTLINENUMBER', 'QTYEXPECTED', 'QTYRECEIVED', 'UOM', 'PACKKEY']
+2026-02-24 15:47:35,941 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Mapeando columnas Excel a índices...
+2026-02-24 15:47:35,998 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Columnas extraídas: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:47:35,999 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] DataFrame creado con 8 columnas
+2026-02-24 15:47:36,006 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Después de limpiar: 6418 filas
+2026-02-24 15:47:36,013 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] STATUS procesado
+2026-02-24 15:47:36,032 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Cantidades: 5078 positivas, 1340 cero
+2026-02-24 15:47:37,442 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Fechas procesadas. Rango: None - None
+2026-02-24 15:47:37,472 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Procesamiento exitoso: 6418 registros finales
+2026-02-24 15:47:37,473 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Vista previa: 100 filas
+2026-02-24 15:47:37,473 - procesadores.recepcion_procesador - INFO - [20260224_154709_442652] Hoja usada: 'Detail'
+2026-02-24 15:47:37,482 - __main__ - INFO - [20260224_154709_442652] Procesamiento completado en 28.04 segundos
+2026-02-24 15:47:38,028 - __main__ - INFO - [20260224_154709_442652] Archivo temporal eliminado
+2026-02-24 15:47:38,029 - __main__ - INFO - [20260224_154709_442652] Enviando respuesta JSON exitosamente
+2026-02-24 15:47:38,417 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:47:38] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:48:43,878 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:48:43] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:48:43,891 - __main__ - INFO - [20260224_154843_890653] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:48:44,105 - __main__ - INFO - [20260224_154843_890653] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154843_890653_Export (51).xlsx (3378917 bytes)
+2026-02-24 15:48:44,105 - __main__ - INFO - [20260224_154843_890653] Filtros: desde=2026-02-01, hasta=2026-02-24
+2026-02-24 15:48:44,106 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 15:48:44,106 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_154843_890653_Export (51).xlsx
+2026-02-24 15:48:44,107 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Leyendo archivo Excel para obtener hojas...
+2026-02-24 15:48:44,149 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Hojas disponibles en el archivo: ['Data', 'Detail', 'Validations']
+2026-02-24 15:48:44,165 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Hoja seleccionada para procesar: 'Detail'
+2026-02-24 15:48:44,166 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Leyendo hoja 'Detail'...
+2026-02-24 15:49:10,485 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Hoja leída: 6418 filas, 148 columnas
+2026-02-24 15:49:10,485 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'SKU', 'STORERKEY', 'RECEIPTLINENUMBER', 'QTYEXPECTED', 'QTYRECEIVED', 'UOM', 'PACKKEY']
+2026-02-24 15:49:10,486 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Mapeando columnas Excel a índices...
+2026-02-24 15:49:10,546 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Columnas extraídas: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:49:10,547 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] DataFrame creado con 8 columnas
+2026-02-24 15:49:10,554 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Después de limpiar: 6418 filas
+2026-02-24 15:49:10,561 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] STATUS procesado
+2026-02-24 15:49:10,579 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Cantidades: 5078 positivas, 1340 cero
+2026-02-24 15:49:12,321 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Fechas procesadas. Rango: None - None
+2026-02-24 15:49:12,325 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Procesamiento exitoso: 0 registros finales
+2026-02-24 15:49:12,326 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Vista previa: 0 filas
+2026-02-24 15:49:12,326 - procesadores.recepcion_procesador - INFO - [20260224_154843_890653] Hoja usada: 'Detail'
+2026-02-24 15:49:12,334 - __main__ - INFO - [20260224_154843_890653] Procesamiento completado en 28.44 segundos
+2026-02-24 15:49:12,890 - __main__ - INFO - [20260224_154843_890653] Archivo temporal eliminado
+2026-02-24 15:49:12,890 - __main__ - INFO - [20260224_154843_890653] Enviando respuesta JSON exitosamente
+2026-02-24 15:49:12,979 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:49:12] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 15:49:47,413 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:49:47] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:50:13,421 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:50:13] "GET /health HTTP/1.1" 200 -
+2026-02-24 15:50:13,431 - __main__ - INFO - [20260224_155013_431559] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 15:50:13,606 - __main__ - INFO - [20260224_155013_431559] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_155013_431559_Export (50).xlsx (1454600 bytes)
+2026-02-24 15:50:13,607 - __main__ - INFO - [20260224_155013_431559] Filtros: desde=, hasta=
+2026-02-24 15:50:13,609 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 15:50:13,612 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_155013_431559_Export (50).xlsx
+2026-02-24 15:50:13,614 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Leyendo archivo Excel para obtener hojas...
+2026-02-24 15:50:13,664 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Hojas disponibles en el archivo: ['Data', 'Detail', 'Validations']
+2026-02-24 15:50:13,671 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Hoja seleccionada para procesar: 'Detail'
+2026-02-24 15:50:13,672 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Leyendo hoja 'Detail'...
+2026-02-24 15:50:20,534 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Hoja leída: 2824 filas, 148 columnas
+2026-02-24 15:50:20,535 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Columnas disponibles: ['Column Name', 'GenericKey', 'RECEIPTKEY', 'SKU', 'STORERKEY', 'RECEIPTLINENUMBER', 'QTYEXPECTED', 'QTYRECEIVED', 'UOM', 'PACKKEY']
+2026-02-24 15:50:20,536 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Mapeando columnas Excel a índices...
+2026-02-24 15:50:20,599 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Columnas extraídas: ['RECEIPTKEY', 'SKU', 'STORERKEY', 'QTYRECEIVED', 'UOM', 'STATUS', 'DATERECEIVED', 'EXTERNRECEIPTKEY']
+2026-02-24 15:50:20,600 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] DataFrame creado con 8 columnas
+2026-02-24 15:50:20,602 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Después de limpiar: 2824 filas
+2026-02-24 15:50:20,604 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] STATUS procesado
+2026-02-24 15:50:20,613 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Cantidades: 2633 positivas, 191 cero
+2026-02-24 15:50:21,055 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Fechas procesadas. Rango: None - None
+2026-02-24 15:50:21,071 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Procesamiento exitoso: 2824 registros finales
+2026-02-24 15:50:21,072 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Vista previa: 100 filas
+2026-02-24 15:50:21,074 - procesadores.recepcion_procesador - INFO - [20260224_155013_431559] Hoja usada: 'Detail'
+2026-02-24 15:50:21,079 - __main__ - INFO - [20260224_155013_431559] Procesamiento completado en 7.65 segundos
+2026-02-24 15:50:21,617 - __main__ - INFO - [20260224_155013_431559] Archivo temporal eliminado
+2026-02-24 15:50:21,618 - __main__ - INFO - [20260224_155013_431559] Enviando respuesta JSON exitosamente
+2026-02-24 15:50:21,660 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 15:50:21] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 16:20:49,555 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 16:20:50,010 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:20:52,990 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:20:52,994 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:20:53,072 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 16:20:53,087 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 16:21:00,232 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 16:21:00,425 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:21:02,589 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:21:02,591 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:21:02,643 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 16:21:02,655 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 16:21:06,509 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 16:21:06,669 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:21:08,552 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:21:08,557 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:21:08,606 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 16:21:08,617 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 16:21:11,146 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:21:11] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:21:40,844 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:21:40] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:21:40,857 - __main__ - INFO - [20260224_162140_857007] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 16:21:41,093 - __main__ - INFO - [20260224_162140_857007] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162140_857007_Export (51).xlsx (3378917 bytes)
+2026-02-24 16:21:41,093 - __main__ - INFO - [20260224_162140_857007] Filtros: desde=, hasta=
+2026-02-24 16:21:41,094 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 16:21:41,094 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162140_857007_Export (51).xlsx
+2026-02-24 16:21:41,095 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Filtros: fecha_desde=None, fecha_hasta=None
+2026-02-24 16:21:41,095 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Leyendo archivo Excel...
+2026-02-24 16:21:41,539 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 16:21:41,559 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Hoja seleccionada: 'Detail'
+2026-02-24 16:21:41,560 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Leyendo hoja 'Detail'...
+2026-02-24 16:22:03,029 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Hoja leída: 6419 filas, 148 columnas
+2026-02-24 16:22:03,088 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] DataFrame inicial: 6418 filas
+2026-02-24 16:22:03,094 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Después de limpiar vacíos: 6418 filas
+2026-02-24 16:22:03,154 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Filas filtradas por STATUS (no 11/15): 4113
+2026-02-24 16:22:03,155 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Filas después de filtro STATUS: 2305
+2026-02-24 16:22:03,156 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Procesando cantidades - extrayendo parte entera...
+2026-02-24 16:22:03,161 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Cantidades enteras extraídas - min: 0, max: 996
+2026-02-24 16:22:03,163 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Procesando fechas...
+2026-02-24 16:22:03,450 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Agrupando por RECEIPTKEY + SKU...
+2026-02-24 16:22:03,465 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Grupos únicos encontrados: 357
+2026-02-24 16:22:03,759 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Después de agrupar: 357 filas
+2026-02-24 16:22:03,760 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Reducción por agrupación: 1948 filas
+2026-02-24 16:22:03,762 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] ESTADÍSTICAS FINALES:
+2026-02-24 16:22:03,764 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007]   - Filas originales: 2305
+2026-02-24 16:22:03,764 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007]   - Filas después de agrupar: 357
+2026-02-24 16:22:03,764 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007]   - Filas filtradas por STATUS: 4113
+2026-02-24 16:22:03,765 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007]   - Filas filtradas por fecha: 0
+2026-02-24 16:22:03,765 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007]   - Registros finales: 357
+2026-02-24 16:22:03,776 - procesadores.recepcion_procesador - INFO - [20260224_162140_857007] Procesamiento completado exitosamente
+2026-02-24 16:22:03,786 - __main__ - INFO - [20260224_162140_857007] Procesamiento completado en 22.93 segundos
+2026-02-24 16:22:04,313 - __main__ - INFO - [20260224_162140_857007] Archivo temporal eliminado
+2026-02-24 16:22:04,314 - __main__ - INFO - [20260224_162140_857007] Enviando respuesta JSON exitosamente
+2026-02-24 16:22:04,328 - __main__ - ERROR - [20260224_162140_857007] ERROR: Object of type int64 is not JSON serializable
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 167, in procesar_archivo
+    return jsonify(resultado)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type int64 is not JSON serializable
+
+2026-02-24 16:22:04,411 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:22:04] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 16:22:12,055 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:22:12] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:22:27,823 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:22:27] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:22:27,840 - __main__ - INFO - [20260224_162227_840916] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 16:22:27,957 - __main__ - INFO - [20260224_162227_840916] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162227_840916_Export (50).xlsx (1454600 bytes)
+2026-02-24 16:22:27,958 - __main__ - INFO - [20260224_162227_840916] Filtros: desde=, hasta=
+2026-02-24 16:22:27,959 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 16:22:27,959 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162227_840916_Export (50).xlsx
+2026-02-24 16:22:27,959 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Filtros: fecha_desde=None, fecha_hasta=None
+2026-02-24 16:22:27,960 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Leyendo archivo Excel...
+2026-02-24 16:22:28,006 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 16:22:28,019 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Hoja seleccionada: 'Detail'
+2026-02-24 16:22:28,020 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Leyendo hoja 'Detail'...
+2026-02-24 16:22:35,842 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Hoja leída: 2825 filas, 148 columnas
+2026-02-24 16:22:35,899 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] DataFrame inicial: 2824 filas
+2026-02-24 16:22:35,903 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Después de limpiar vacíos: 2824 filas
+2026-02-24 16:22:35,906 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Filas filtradas por STATUS (no 11/15): 1089
+2026-02-24 16:22:35,907 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Filas después de filtro STATUS: 1735
+2026-02-24 16:22:35,907 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Procesando cantidades - extrayendo parte entera...
+2026-02-24 16:22:35,913 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Cantidades enteras extraídas - min: 0, max: 996
+2026-02-24 16:22:35,914 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Procesando fechas...
+2026-02-24 16:22:36,142 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Agrupando por RECEIPTKEY + SKU...
+2026-02-24 16:22:36,146 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Grupos únicos encontrados: 280
+2026-02-24 16:22:36,389 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Después de agrupar: 280 filas
+2026-02-24 16:22:36,390 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Reducción por agrupación: 1455 filas
+2026-02-24 16:22:36,392 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] ESTADÍSTICAS FINALES:
+2026-02-24 16:22:36,393 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916]   - Filas originales: 1735
+2026-02-24 16:22:36,393 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916]   - Filas después de agrupar: 280
+2026-02-24 16:22:36,394 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916]   - Filas filtradas por STATUS: 1089
+2026-02-24 16:22:36,394 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916]   - Filas filtradas por fecha: 0
+2026-02-24 16:22:36,395 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916]   - Registros finales: 280
+2026-02-24 16:22:36,407 - procesadores.recepcion_procesador - INFO - [20260224_162227_840916] Procesamiento completado exitosamente
+2026-02-24 16:22:36,412 - __main__ - INFO - [20260224_162227_840916] Procesamiento completado en 8.57 segundos
+2026-02-24 16:22:36,943 - __main__ - INFO - [20260224_162227_840916] Archivo temporal eliminado
+2026-02-24 16:22:36,943 - __main__ - INFO - [20260224_162227_840916] Enviando respuesta JSON exitosamente
+2026-02-24 16:22:36,946 - __main__ - ERROR - [20260224_162227_840916] ERROR: Object of type int64 is not JSON serializable
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 167, in procesar_archivo
+    return jsonify(resultado)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type int64 is not JSON serializable
+
+2026-02-24 16:22:36,984 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:22:36] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 16:22:44,039 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:22:44] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:22:44,048 - __main__ - INFO - [20260224_162244_048433] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 16:22:44,151 - __main__ - INFO - [20260224_162244_048433] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162244_048433_Export (50).xlsx (1454600 bytes)
+2026-02-24 16:22:44,151 - __main__ - INFO - [20260224_162244_048433] Filtros: desde=, hasta=
+2026-02-24 16:22:44,152 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 16:22:44,152 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162244_048433_Export (50).xlsx
+2026-02-24 16:22:44,153 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Filtros: fecha_desde=None, fecha_hasta=None
+2026-02-24 16:22:44,153 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Leyendo archivo Excel...
+2026-02-24 16:22:44,185 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 16:22:44,191 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Hoja seleccionada: 'Detail'
+2026-02-24 16:22:44,192 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Leyendo hoja 'Detail'...
+2026-02-24 16:22:52,893 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Hoja leída: 2825 filas, 148 columnas
+2026-02-24 16:22:52,950 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] DataFrame inicial: 2824 filas
+2026-02-24 16:22:52,952 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Después de limpiar vacíos: 2824 filas
+2026-02-24 16:22:52,958 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Filas filtradas por STATUS (no 11/15): 1089
+2026-02-24 16:22:52,959 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Filas después de filtro STATUS: 1735
+2026-02-24 16:22:52,960 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Procesando cantidades - extrayendo parte entera...
+2026-02-24 16:22:52,966 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Cantidades enteras extraídas - min: 0, max: 996
+2026-02-24 16:22:52,967 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Procesando fechas...
+2026-02-24 16:22:53,225 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Agrupando por RECEIPTKEY + SKU...
+2026-02-24 16:22:53,228 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Grupos únicos encontrados: 280
+2026-02-24 16:22:53,492 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Después de agrupar: 280 filas
+2026-02-24 16:22:53,493 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Reducción por agrupación: 1455 filas
+2026-02-24 16:22:53,495 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] ESTADÍSTICAS FINALES:
+2026-02-24 16:22:53,496 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433]   - Filas originales: 1735
+2026-02-24 16:22:53,496 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433]   - Filas después de agrupar: 280
+2026-02-24 16:22:53,497 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433]   - Filas filtradas por STATUS: 1089
+2026-02-24 16:22:53,497 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433]   - Filas filtradas por fecha: 0
+2026-02-24 16:22:53,497 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433]   - Registros finales: 280
+2026-02-24 16:22:53,511 - procesadores.recepcion_procesador - INFO - [20260224_162244_048433] Procesamiento completado exitosamente
+2026-02-24 16:22:53,516 - __main__ - INFO - [20260224_162244_048433] Procesamiento completado en 9.47 segundos
+2026-02-24 16:22:54,082 - __main__ - INFO - [20260224_162244_048433] Archivo temporal eliminado
+2026-02-24 16:22:54,083 - __main__ - INFO - [20260224_162244_048433] Enviando respuesta JSON exitosamente
+2026-02-24 16:22:54,085 - __main__ - ERROR - [20260224_162244_048433] ERROR: Object of type int64 is not JSON serializable
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 167, in procesar_archivo
+    return jsonify(resultado)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type int64 is not JSON serializable
+
+2026-02-24 16:22:54,138 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:22:54] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 16:23:14,563 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:23:14,567 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:23:14,638 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-24 16:23:14,639 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 16:23:14,641 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:23:16,078 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:23:16,080 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:23:16,142 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 16:23:16,157 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 16:23:17,752 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:23:17] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:23:27,580 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:23:27] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:23:27,587 - __main__ - INFO - [20260224_162327_587101] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 16:23:27,750 - __main__ - INFO - [20260224_162327_587101] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162327_587101_Export (51).xlsx (3378917 bytes)
+2026-02-24 16:23:27,750 - __main__ - INFO - [20260224_162327_587101] Filtros: desde=, hasta=
+2026-02-24 16:23:27,751 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 16:23:27,751 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162327_587101_Export (51).xlsx
+2026-02-24 16:23:27,751 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Filtros: fecha_desde=None, fecha_hasta=None
+2026-02-24 16:23:27,752 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Leyendo archivo Excel...
+2026-02-24 16:23:28,064 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 16:23:28,076 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Hoja seleccionada: 'Detail'
+2026-02-24 16:23:28,076 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Leyendo hoja 'Detail'...
+2026-02-24 16:23:48,065 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Hoja leída: 6419 filas, 148 columnas
+2026-02-24 16:23:48,129 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] DataFrame inicial: 6418 filas
+2026-02-24 16:23:48,132 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Después de limpiar vacíos: 6418 filas
+2026-02-24 16:23:48,191 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Filas filtradas por STATUS (no 11/15): 4113
+2026-02-24 16:23:48,192 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Filas después de filtro STATUS: 2305
+2026-02-24 16:23:48,193 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Procesando cantidades - extrayendo parte entera...
+2026-02-24 16:23:48,199 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Cantidades enteras extraídas - min: 0, max: 996
+2026-02-24 16:23:48,200 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Procesando fechas...
+2026-02-24 16:23:48,511 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Agrupando por RECEIPTKEY + SKU...
+2026-02-24 16:23:48,514 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Grupos únicos encontrados: 357
+2026-02-24 16:23:48,776 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Después de agrupar: 357 filas
+2026-02-24 16:23:48,777 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Reducción por agrupación: 1948 filas
+2026-02-24 16:23:48,780 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] ESTADÍSTICAS FINALES:
+2026-02-24 16:23:48,780 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101]   - Filas originales: 2305
+2026-02-24 16:23:48,781 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101]   - Filas después de agrupar: 357
+2026-02-24 16:23:48,782 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101]   - Filas filtradas por STATUS: 4113
+2026-02-24 16:23:48,782 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101]   - Filas filtradas por fecha: 0
+2026-02-24 16:23:48,783 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101]   - Registros finales: 357
+2026-02-24 16:23:48,794 - procesadores.recepcion_procesador - INFO - [20260224_162327_587101] Procesamiento completado exitosamente
+2026-02-24 16:23:48,802 - __main__ - INFO - [20260224_162327_587101] Procesamiento completado en 21.22 segundos
+2026-02-24 16:23:49,331 - __main__ - INFO - [20260224_162327_587101] Archivo temporal eliminado
+2026-02-24 16:23:49,332 - __main__ - INFO - [20260224_162327_587101] Enviando respuesta JSON exitosamente
+2026-02-24 16:23:49,335 - __main__ - ERROR - [20260224_162327_587101] ERROR: Object of type int64 is not JSON serializable
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 167, in procesar_archivo
+    return jsonify(resultado)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type int64 is not JSON serializable
+
+2026-02-24 16:23:49,418 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:23:49] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 16:24:11,090 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:24:11,093 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:24:11,171 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-24 16:24:11,172 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 16:24:11,174 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:24:12,557 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:24:12,560 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:24:12,593 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 16:24:12,603 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 16:24:13,415 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:24:13] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:24:26,083 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:24:26] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:24:26,089 - __main__ - INFO - [20260224_162426_089181] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 16:24:26,270 - __main__ - INFO - [20260224_162426_089181] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162426_089181_Export (51).xlsx (3378917 bytes)
+2026-02-24 16:24:26,271 - __main__ - INFO - [20260224_162426_089181] Filtros: desde=, hasta=
+2026-02-24 16:24:26,272 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 16:24:26,272 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162426_089181_Export (51).xlsx
+2026-02-24 16:24:26,272 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Filtros: fecha_desde=None, fecha_hasta=None
+2026-02-24 16:24:26,273 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Leyendo archivo Excel...
+2026-02-24 16:24:26,603 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 16:24:26,616 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Hoja seleccionada: 'Detail'
+2026-02-24 16:24:26,616 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Leyendo hoja 'Detail'...
+2026-02-24 16:24:44,175 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Hoja leída: 6419 filas, 148 columnas
+2026-02-24 16:24:44,247 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] DataFrame inicial: 6418 filas
+2026-02-24 16:24:44,252 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Después de limpiar vacíos: 6418 filas
+2026-02-24 16:24:44,316 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Filas filtradas por STATUS (no 11/15): 4113
+2026-02-24 16:24:44,318 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Filas después de filtro STATUS: 2305
+2026-02-24 16:24:44,318 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Procesando cantidades - extrayendo parte entera...
+2026-02-24 16:24:44,325 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Cantidades enteras extraídas - min: 0, max: 996
+2026-02-24 16:24:44,327 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Procesando fechas...
+2026-02-24 16:24:44,649 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Agrupando por RECEIPTKEY + SKU...
+2026-02-24 16:24:44,653 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Grupos únicos encontrados: 357
+2026-02-24 16:24:44,954 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Después de agrupar: 357 filas
+2026-02-24 16:24:44,955 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Reducción por agrupación: 1948 filas
+2026-02-24 16:24:44,958 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] ESTADÍSTICAS FINALES:
+2026-02-24 16:24:44,959 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181]   - Filas originales: 2305
+2026-02-24 16:24:44,959 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181]   - Filas después de agrupar: 357
+2026-02-24 16:24:44,960 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181]   - Filas filtradas por STATUS: 4113
+2026-02-24 16:24:44,960 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181]   - Filas filtradas por fecha: 0
+2026-02-24 16:24:44,961 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181]   - Registros finales: 357
+2026-02-24 16:24:44,978 - procesadores.recepcion_procesador - INFO - [20260224_162426_089181] Procesamiento completado exitosamente
+2026-02-24 16:24:44,989 - __main__ - INFO - [20260224_162426_089181] Procesamiento completado en 18.90 segundos
+2026-02-24 16:24:45,523 - __main__ - INFO - [20260224_162426_089181] Archivo temporal eliminado
+2026-02-24 16:24:45,524 - __main__ - INFO - [20260224_162426_089181] Enviando respuesta JSON exitosamente
+2026-02-24 16:24:45,527 - __main__ - ERROR - [20260224_162426_089181] ERROR: Object of type int64 is not JSON serializable
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 167, in procesar_archivo
+    return jsonify(resultado)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type int64 is not JSON serializable
+
+2026-02-24 16:24:45,621 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:24:45] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 16:25:32,946 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:25:32] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:25:32,951 - __main__ - INFO - [20260224_162532_951147] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 16:25:33,147 - __main__ - INFO - [20260224_162532_951147] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162532_951147_Export (51).xlsx (3378917 bytes)
+2026-02-24 16:25:33,148 - __main__ - INFO - [20260224_162532_951147] Filtros: desde=, hasta=
+2026-02-24 16:25:33,148 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 16:25:33,149 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_162532_951147_Export (51).xlsx
+2026-02-24 16:25:33,149 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Filtros: fecha_desde=None, fecha_hasta=None
+2026-02-24 16:25:33,150 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Leyendo archivo Excel...
+2026-02-24 16:25:33,181 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 16:25:33,192 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Hoja seleccionada: 'Detail'
+2026-02-24 16:25:33,193 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Leyendo hoja 'Detail'...
+2026-02-24 16:25:49,378 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Hoja leída: 6419 filas, 148 columnas
+2026-02-24 16:25:49,449 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] DataFrame inicial: 6418 filas
+2026-02-24 16:25:49,452 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Después de limpiar vacíos: 6418 filas
+2026-02-24 16:25:49,464 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Filas filtradas por STATUS (no 11/15): 4113
+2026-02-24 16:25:49,465 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Filas después de filtro STATUS: 2305
+2026-02-24 16:25:49,466 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Procesando cantidades - extrayendo parte entera...
+2026-02-24 16:25:49,473 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Cantidades enteras extraídas - min: 0, max: 996
+2026-02-24 16:25:49,474 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Procesando fechas...
+2026-02-24 16:25:49,837 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Agrupando por RECEIPTKEY + SKU...
+2026-02-24 16:25:49,842 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Grupos únicos encontrados: 357
+2026-02-24 16:25:50,254 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Después de agrupar: 357 filas
+2026-02-24 16:25:50,255 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Reducción por agrupación: 1948 filas
+2026-02-24 16:25:50,257 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] ESTADÍSTICAS FINALES:
+2026-02-24 16:25:50,258 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147]   - Filas originales: 2305
+2026-02-24 16:25:50,258 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147]   - Filas después de agrupar: 357
+2026-02-24 16:25:50,259 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147]   - Filas filtradas por STATUS: 4113
+2026-02-24 16:25:50,259 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147]   - Filas filtradas por fecha: 0
+2026-02-24 16:25:50,260 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147]   - Registros finales: 357
+2026-02-24 16:25:50,275 - procesadores.recepcion_procesador - INFO - [20260224_162532_951147] Procesamiento completado exitosamente
+2026-02-24 16:25:50,290 - __main__ - INFO - [20260224_162532_951147] Procesamiento completado en 17.34 segundos
+2026-02-24 16:25:50,830 - __main__ - INFO - [20260224_162532_951147] Archivo temporal eliminado
+2026-02-24 16:25:50,831 - __main__ - INFO - [20260224_162532_951147] Enviando respuesta JSON exitosamente
+2026-02-24 16:25:50,835 - __main__ - ERROR - [20260224_162532_951147] ERROR: Object of type int64 is not JSON serializable
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\Portal-Facturacion\api_python\app.py", line 167, in procesar_archivo
+    return jsonify(resultado)
+           ^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 202, in encode
+    chunks = list(chunks)
+             ^^^^^^^^^^^^
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 432, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 406, in _iterencode_dict
+    yield from chunks
+  File "C:\Users\JohnArielLaricoMacha\AppData\Local\Programs\Python\Python311\Lib\json\encoder.py", line 439, in _iterencode
+    o = _default(o)
+        ^^^^^^^^^^^
+  File "C:\xampp\htdocs\Portal-Facturacion\venv\Lib\site-packages\flask\json\provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type int64 is not JSON serializable
+
+2026-02-24 16:25:50,952 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:25:50] "[35m[1mPOST /procesar/recepcion HTTP/1.1[0m" 500 -
+2026-02-24 16:26:52,635 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 16:26:52,811 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:26:55,633 - __main__ - ERROR - Error importando procesadores: cannot import name 'RecepcionProcesador' from 'procesadores.recepcion_procesador' (C:\xampp\htdocs\Portal-Facturacion\api_python\procesadores\recepcion_procesador.py)

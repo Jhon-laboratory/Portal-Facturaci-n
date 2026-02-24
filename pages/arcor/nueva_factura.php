@@ -604,6 +604,51 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             margin-top: 5px;
         }
 
+        /* Notificaciones toast */
+        #notification-toast {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-primary {
+            background: #cce5ff;
+            color: #004085;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .modulos-grid {
@@ -832,11 +877,11 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                                     <span class="value" id="recepcion-bultos">-</span>
                                 </div>
                                 <div class="data-item">
-                                    <span class="label">Proveedores</span>
+                                    <span class="label">Total Unidades</span>
                                     <span class="value" id="recepcion-proveedores">-</span>
                                 </div>
                                 <div class="data-item">
-                                    <span class="label">Fecha Recepción</span>
+                                    <span class="label">Periodo</span>
                                     <span class="value" id="recepcion-fecha">-</span>
                                 </div>
                             </div>
@@ -1093,6 +1138,86 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             fecha_hasta: ''
         };
 
+        // Verificar API Python al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            verificarApiPython();
+        });
+
+        // Función para verificar disponibilidad de la API Python
+        function verificarApiPython() {
+            fetch('http://127.0.0.1:5000/health', { mode: 'no-cors' })
+                .then(() => {
+                    console.log('✅ API Python disponible');
+                    mostrarNotificacion('API Python conectada', 'success');
+                })
+                .catch(() => {
+                    console.warn('⚠️ API Python no disponible');
+                    const warning = document.createElement('div');
+                    warning.style.position = 'fixed';
+                    warning.style.bottom = '10px';
+                    warning.style.right = '10px';
+                    warning.style.backgroundColor = '#fff3cd';
+                    warning.style.color = '#856404';
+                    warning.style.padding = '5px 10px';
+                    warning.style.borderRadius = '20px';
+                    warning.style.fontSize = '12px';
+                    warning.style.zIndex = '9999';
+                    warning.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                    warning.innerHTML = '<i class="fa fa-exclamation-triangle"></i> Python API no disponible. Ejecuta: python api_python/app.py';
+                    document.body.appendChild(warning);
+                    
+                    setTimeout(() => warning.remove(), 8000);
+                });
+        }
+
+        // Función para mostrar notificaciones toast
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            let toast = document.getElementById('notification-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'notification-toast';
+                toast.style.position = 'fixed';
+                toast.style.top = '20px';
+                toast.style.right = '20px';
+                toast.style.zIndex = '9999';
+                toast.style.minWidth = '300px';
+                toast.style.padding = '15px 20px';
+                toast.style.borderRadius = '8px';
+                toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                toast.style.transition = 'all 0.3s ease';
+                document.body.appendChild(toast);
+            }
+            
+            const colors = {
+                success: { bg: '#d4edda', text: '#155724', border: '#c3e6cb', icon: 'check-circle' },
+                error: { bg: '#f8d7da', text: '#721c24', border: '#f5c6cb', icon: 'exclamation-circle' },
+                warning: { bg: '#fff3cd', text: '#856404', border: '#ffeeba', icon: 'exclamation-triangle' },
+                info: { bg: '#d1ecf1', text: '#0c5460', border: '#bee5eb', icon: 'info-circle' }
+            };
+            
+            const style = colors[tipo] || colors.info;
+            
+            toast.style.backgroundColor = style.bg;
+            toast.style.color = style.text;
+            toast.style.border = `1px solid ${style.border}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <i class="fa fa-${style.icon}" style="margin-right: 10px; font-size: 18px;"></i>
+                    <div style="flex: 1;">${mensaje}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: none; border: none; color: inherit; cursor: pointer;">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
         // Función para habilitar botón de procesar
         function habilitarBotonProcesar(tipo) {
             const fileInput = document.getElementById(`file-${tipo}`);
@@ -1117,7 +1242,7 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
 
             const extension = file.name.split('.').pop().toLowerCase();
             if (!['xls', 'xlsx', 'csv'].includes(extension)) {
-                alert('Formato no válido. Solo se permiten archivos .xls, .xlsx o .csv');
+                mostrarNotificacion('Formato no válido. Solo .xls, .xlsx o .csv', 'error');
                 fileInput.value = '';
                 habilitarBotonProcesar(tipo);
                 return;
@@ -1168,14 +1293,13 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
             
             if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
-                alert('La fecha "desde" no puede ser mayor que la fecha "hasta"');
+                mostrarNotificacion('La fecha "desde" no puede ser mayor que la fecha "hasta"', 'warning');
                 return;
             }
             
             filtrosActuales.fecha_desde = fechaDesde;
             filtrosActuales.fecha_hasta = fechaHasta;
             
-            // Recargar vista previa con filtros
             mostrarVistaPrevia(moduloActual);
         }
 
@@ -1199,7 +1323,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 rangoMax.textContent = stats.fecha_max || 'No disponible';
             }
             
-            // Mostrar estadísticas de filtros
             if (filterStats) {
                 let statsHtml = '';
                 if (stats.filas_filtradas_cantidad > 0) {
@@ -1215,19 +1338,23 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             }
         }
 
-        // Función para mostrar vista previa - VERSIÓN CON FILTROS
+        // Función para mostrar vista previa con Python
         function mostrarVistaPrevia(tipo) {
             moduloActual = tipo;
             
             const fileInput = document.getElementById(`file-${tipo}`);
             if (!fileInput.files[0]) {
-                alert('Debe seleccionar un archivo primero');
+                mostrarNotificacion('Debe seleccionar un archivo primero', 'warning');
                 return;
             }
             
             const file = fileInput.files[0];
             
-            // Títulos para cada módulo
+            if (file.size > 500 * 1024 * 1024) {
+                mostrarNotificacion('El archivo es demasiado grande. Máximo 500MB', 'error');
+                return;
+            }
+            
             const titulos = {
                 despacho: 'Despachos',
                 recepcion: 'Recepciones',
@@ -1237,7 +1364,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             
             document.getElementById('modal-titulo-modulo').textContent = titulos[tipo];
             
-            // Mostrar sección de filtros solo para recepción
             const filterSection = document.getElementById('filterSection');
             if (tipo === 'recepcion') {
                 filterSection.style.display = 'block';
@@ -1245,23 +1371,19 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 filterSection.style.display = 'none';
             }
             
-            // Mostrar loading
             document.getElementById('preview-body').innerHTML = 
                 '<tr><td colspan="20" class="text-center">' +
                 '<i class="fa fa-spinner fa-spin fa-3x"></i><br><br>' +
-                'Procesando archivo...' +
+                'Procesando archivo con Python (esto puede tomar unos segundos para archivos grandes)...' +
                 '</td></tr>';
             document.getElementById('preview-header').innerHTML = '';
             document.getElementById('btn-confirmar').disabled = true;
             
-            // Mostrar modal
             $('#modalVistaPrevia').modal('show');
             
-            // Crear FormData
             const formData = new FormData();
             formData.append('archivo', file);
             
-            // Agregar filtros de fecha si existen
             if (filtrosActuales.fecha_desde) {
                 formData.append('fecha_desde', filtrosActuales.fecha_desde);
             }
@@ -1269,70 +1391,55 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 formData.append('fecha_hasta', filtrosActuales.fecha_hasta);
             }
             
-            // URL del controller
             let controllerUrl = '';
             if (tipo === 'recepcion') {
-                controllerUrl = '../../controller/arcor/recep.arcor.scz.php';
+                controllerUrl = '../../controller/arcor/recepcion_python.php';
             } else {
-                alert('El módulo de ' + tipo + ' estará disponible próximamente');
+                mostrarNotificacion('El módulo de ' + tipo + ' estará disponible próximamente', 'info');
                 $('#modalVistaPrevia').modal('hide');
                 return;
             }
             
-            console.log('Enviando archivo:', file.name);
-            console.log('URL:', controllerUrl);
+            console.log('Enviando archivo a Python:', file.name);
+            console.log('Tamaño:', (file.size / 1024 / 1024).toFixed(2), 'MB');
             console.log('Filtros:', filtrosActuales);
             
-            // Hacer fetch
+            const startTime = Date.now();
+            
             fetch(controllerUrl, {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
                 console.log('Status:', response.status);
-                console.log('Status Text:', response.statusText);
                 
                 if (!response.ok) {
                     throw new Error('Error HTTP: ' + response.status);
                 }
                 
-                return response.text();
-            })
-            .then(text => {
-                console.log('Respuesta raw:', text.substring(0, 500));
-                
-                try {
-                    return JSON.parse(text);
-                } catch (e) {
-                    console.error('Error parseando JSON:', e);
-                    console.error('Respuesta completa:', text);
-                    
-                    if (text.trim().startsWith('<')) {
-                        throw new Error('El servidor devolvió HTML en lugar de JSON. Posible error PHP.');
-                    } else {
-                        throw new Error('La respuesta no es JSON válido: ' + e.message);
-                    }
-                }
+                return response.json();
             })
             .then(data => {
-                console.log('Datos recibidos:', data);
+                const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+                console.log(`Respuesta recibida en ${elapsed}s:`, data);
                 
                 if (data.error) {
-                    alert('Error: ' + data.error);
+                    mostrarNotificacion('Error: ' + data.error, 'error');
                     $('#modalVistaPrevia').modal('hide');
                     return;
                 }
                 
-                // Guardar datos
                 datosProcesados[tipo] = data;
                 
-                // Actualizar estadísticas
+                if (data.metadata) {
+                    console.log(`Tiempo Python: ${data.metadata.tiempo_procesamiento}s`);
+                }
+                
                 if (data.stats) {
                     actualizarEstadisticasModulo(tipo, data.stats);
                     actualizarInfoRangoFechas(data.stats);
                 }
                 
-                // Mostrar mensajes de filtrado
                 if (data.mensaje) {
                     console.log(data.mensaje);
                 }
@@ -1340,57 +1447,100 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     console.log(data.mensaje_fecha);
                 }
                 
-                // Generar tabla
                 generarTablaPreview(tipo, data);
                 
-                // Habilitar botón
                 document.getElementById('btn-confirmar').disabled = false;
+                
+                const tiempoTotal = data.metadata ? data.metadata.tiempo_procesamiento : elapsed;
+                
+                // Remover alertas anteriores
+                $('.modal-body .alert.alert-success').remove();
+                
+                $('.modal-body').append(
+                    `<div class="alert alert-success" style="margin-top: 10px;">
+                        <i class="fa fa-clock-o"></i> 
+                        Procesado en ${tiempoTotal} segundos | 
+                        <i class="fa fa-database"></i> 
+                        ${data.total_registros} registros
+                    </div>`
+                );
             })
             .catch(error => {
                 console.error('Error completo:', error);
-                alert('Error al procesar: ' + error.message);
+                
+                let errorMsg = 'Error al procesar: ';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMsg += 'No se pudo conectar con el servidor Python. Asegúrate de que la API Python está corriendo (python api_python/app.py)';
+                } else {
+                    errorMsg += error.message;
+                }
+                
+                mostrarNotificacion(errorMsg, 'error');
                 $('#modalVistaPrevia').modal('hide');
             });
         }
 
-        // Función para generar tabla preview
+        // Función para generar tabla preview mejorada
         function generarTablaPreview(tipo, data) {
             const header = document.getElementById('preview-header');
             const body = document.getElementById('preview-body');
+            const summary = document.getElementById('previewSummary');
             
             header.innerHTML = '';
             body.innerHTML = '';
             
-            // Usar headers del archivo
             const headers = data.headers || [];
             
-            // Si no hay headers, crear algunos por defecto
-            if (headers.length === 0 && data.data && data.data.length > 0) {
-                for (let i = 0; i < data.data[0].length; i++) {
-                    headers.push('Columna ' + (i + 1));
-                }
-            }
-            
-            // Crear header
             headers.forEach(col => {
                 const th = document.createElement('th');
                 th.textContent = col || 'Columna';
+                
+                const friendlyNames = {
+                    'RECEIPTKEY': 'N° de Recepción',
+                    'SKU': 'Código Artículo',
+                    'STORERKEY': 'Propietario',
+                    'QTYRECEIVED': 'Cantidad Recibida',
+                    'UOM': 'Unidad de Medida',
+                    'STATUS': 'Estado',
+                    'DATERECEIVED': 'Fecha Recepción',
+                    'EXTERNRECEIPTKEY': 'ASN Externo'
+                };
+                
+                if (friendlyNames[col]) {
+                    th.setAttribute('title', friendlyNames[col]);
+                    th.style.cursor = 'help';
+                }
+                
                 header.appendChild(th);
             });
             
-            // Crear body con datos
             if (data.data && data.data.length > 0) {
-                data.data.forEach(row => {
+                data.data.forEach((row) => {
                     const tr = document.createElement('tr');
                     
-                    // Asegurar que row sea array
                     const rowData = Array.isArray(row) ? row : [row];
                     
-                    rowData.forEach(cell => {
+                    rowData.forEach((cell, cellIndex) => {
                         const td = document.createElement('td');
                         let valor = cell;
                         
-                        // Truncar texto largo
+                        const headerName = headers[cellIndex] || '';
+                        
+                        if (headerName === 'STATUS') {
+                            if (valor && valor.includes('0 -')) {
+                                td.style.color = '#ff9800';
+                                td.style.fontWeight = 'bold';
+                            } else if (valor && valor.includes('9 -')) {
+                                td.style.color = '#4caf50';
+                                td.style.fontWeight = 'bold';
+                            }
+                        }
+                        
+                        if (headerName === 'QTYRECEIVED') {
+                            td.classList.add('text-right');
+                        }
+                        
                         if (typeof valor === 'string' && valor.length > 50) {
                             valor = valor.substring(0, 50) + '...';
                         }
@@ -1401,30 +1551,94 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     
                     body.appendChild(tr);
                 });
+                
+                if (data.total_registros > data.data.length) {
+                    const infoRow = document.createElement('tr');
+                    const infoCell = document.createElement('td');
+                    infoCell.colSpan = headers.length;
+                    infoCell.className = 'text-center text-muted';
+                    infoCell.style.padding = '15px';
+                    infoCell.style.backgroundColor = '#f8f9fa';
+                    infoCell.innerHTML = `<i class="fa fa-info-circle"></i> 
+                        Mostrando ${data.data.length} de ${data.total_registros} registros totales`;
+                    infoRow.appendChild(infoCell);
+                    body.appendChild(infoRow);
+                }
             } else {
                 const tr = document.createElement('tr');
                 const td = document.createElement('td');
                 td.colSpan = headers.length || 1;
                 td.className = 'text-center';
-                td.textContent = 'No hay datos para mostrar';
+                td.innerHTML = '<i class="fa fa-exclamation-triangle"></i> No hay datos para mostrar';
                 tr.appendChild(td);
                 body.appendChild(tr);
             }
             
             document.getElementById('total-registros').textContent = data.total_registros || 0;
+            
+            if (data.stats) {
+                const existingStats = document.getElementById('extra-stats');
+                if (existingStats) {
+                    existingStats.remove();
+                }
+                
+                let statsHtml = '<div id="extra-stats" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: flex; gap: 10px; flex-wrap: wrap;">';
+                
+                if (data.stats.filas_filtradas_cantidad > 0) {
+                    statsHtml += `<span class="badge badge-warning">
+                        <i class="fa fa-filter"></i> Filtrados por cantidad: ${data.stats.filas_filtradas_cantidad}
+                    </span>`;
+                }
+                
+                if (data.stats.filas_filtradas_fecha > 0) {
+                    statsHtml += `<span class="badge badge-info">
+                        <i class="fa fa-calendar"></i> Filtrados por fecha: ${data.stats.filas_filtradas_fecha}
+                    </span>`;
+                }
+                
+                if (data.stats.receiptkeys_unicos) {
+                    statsHtml += `<span class="badge badge-success">
+                        <i class="fa fa-tag"></i> Recepciones únicas: ${data.stats.receiptkeys_unicos}
+                    </span>`;
+                }
+                
+                if (data.stats.total_unidades && data.stats.total_unidades !== '0') {
+                    statsHtml += `<span class="badge badge-primary">
+                        <i class="fa fa-cubes"></i> Total unidades: ${data.stats.total_unidades}
+                    </span>`;
+                }
+                
+                statsHtml += '</div>';
+                
+                summary.insertAdjacentHTML('afterend', statsHtml);
+            }
         }
 
-        // Función para actualizar estadísticas
+        // Función para actualizar estadísticas del módulo
         function actualizarEstadisticasModulo(tipo, stats) {
             if (tipo === 'recepcion') {
                 document.getElementById('recepcion-total').textContent = stats.total_filas || 0;
-                document.getElementById('recepcion-fecha').textContent = stats.mostrando || 0;
+                
+                if (stats.receiptkeys_unicos) {
+                    document.getElementById('recepcion-bultos').textContent = stats.receiptkeys_unicos;
+                }
+                
+                if (stats.total_unidades) {
+                    document.getElementById('recepcion-proveedores').textContent = stats.total_unidades;
+                }
+                
+                if (stats.fecha_min && stats.fecha_max) {
+                    document.getElementById('recepcion-fecha').textContent = 
+                        `${stats.fecha_min} - ${stats.fecha_max}`;
+                } else {
+                    document.getElementById('recepcion-fecha').textContent = 'No disponible';
+                }
             }
             
             document.getElementById(`data-${tipo}`).style.display = 'block';
         }
 
-        // Función para confirmar procesamiento
+        // Función para confirmar procesamiento mejorada
         function confirmarProcesamiento() {
             archivosProcesados++;
             document.getElementById('archivosProcesados').textContent = archivosProcesados;
@@ -1432,38 +1646,50 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             const btnProcesar = document.getElementById(`btn-procesar-${moduloActual}`);
             btnProcesar.disabled = true;
             btnProcesar.classList.remove('active');
+            btnProcesar.innerHTML = '<i class="fa fa-check"></i> Procesado';
             
             document.getElementById(`file-${moduloActual}`).disabled = true;
+            
+            const uploadArea = document.querySelector(`#modulo-${moduloActual} .upload-area`);
+            if (uploadArea) {
+                uploadArea.style.opacity = '0.5';
+                uploadArea.style.cursor = 'not-allowed';
+                uploadArea.onclick = null;
+            }
             
             $('#modalVistaPrevia').modal('hide');
             
             actualizarContador();
             
-            const totalRegistros = datosProcesados[moduloActual]?.total_registros || 0;
-            const stats = datosProcesados[moduloActual]?.stats || {};
+            const data = datosProcesados[moduloActual];
+            const totalRegistros = data?.total_registros || 0;
+            const stats = data?.stats || {};
+            const metadata = data?.metadata || {};
             
-            let mensaje = `Archivo procesado correctamente. Se encontraron ${totalRegistros} registros.`;
+            let mensaje = `✅ Archivo procesado correctamente.\n`;
+            mensaje += `📊 Se encontraron ${totalRegistros} registros.\n`;
+            mensaje += `⏱️ Tiempo de procesamiento: ${metadata.tiempo_procesamiento || 0} segundos.\n`;
+            
             if (stats.filas_filtradas_cantidad > 0) {
-                mensaje += `\nSe filtraron ${stats.filas_filtradas_cantidad} registros con cantidad cero.`;
+                mensaje += `\n⚠️ Se filtraron ${stats.filas_filtradas_cantidad} registros con cantidad cero.`;
             }
             if (stats.filas_filtradas_fecha > 0) {
-                mensaje += `\nSe filtraron ${stats.filas_filtradas_fecha} registros por rango de fechas.`;
+                mensaje += `\n📅 Se filtraron ${stats.filas_filtradas_fecha} registros por rango de fechas.`;
             }
             
-            alert(mensaje);
+            mostrarNotificacion('Archivo procesado correctamente', 'success');
             
-            // Limpiar filtros
             filtrosActuales = { fecha_desde: '', fecha_hasta: '' };
         }
 
         // Función para generar factura
         function generarFactura() {
             if (archivosProcesados === 0) {
-                alert('Debe procesar al menos un módulo');
+                mostrarNotificacion('Debe procesar al menos un módulo', 'warning');
                 return;
             }
             
-            alert('Factura generada correctamente');
+            mostrarNotificacion('Factura generada correctamente', 'success');
         }
 
         // Toggle del menú
