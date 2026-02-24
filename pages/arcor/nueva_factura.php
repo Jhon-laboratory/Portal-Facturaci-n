@@ -1145,10 +1145,13 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
 
         // Función para verificar disponibilidad de la API Python
         function verificarApiPython() {
-            fetch('http://127.0.0.1:5000/health', { mode: 'no-cors' })
-                .then(() => {
-                    console.log('✅ API Python disponible');
-                    mostrarNotificacion('API Python conectada', 'success');
+            fetch('http://127.0.0.1:5000/health')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        console.log('✅ API Python disponible');
+                        mostrarNotificacion('API Python conectada', 'success');
+                    }
                 })
                 .catch(() => {
                     console.warn('⚠️ API Python no disponible');
@@ -1500,8 +1503,9 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     'RECEIPTKEY': 'N° de Recepción',
                     'SKU': 'Código Artículo',
                     'STORERKEY': 'Propietario',
-                    'QTYRECEIVED': 'Cantidad Recibida',
-                    'UOM': 'Unidad de Medida',
+                    'UNIDADES': 'Unidades',
+                    'CAJAS': 'Cajas',
+                    'PALLETS': 'Pallets',
                     'STATUS': 'Estado',
                     'DATERECEIVED': 'Fecha Recepción',
                     'EXTERNRECEIPTKEY': 'ASN Externo'
@@ -1527,18 +1531,12 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                         
                         const headerName = headers[cellIndex] || '';
                         
-                        if (headerName === 'STATUS') {
-                            if (valor && valor.includes('0 -')) {
-                                td.style.color = '#ff9800';
-                                td.style.fontWeight = 'bold';
-                            } else if (valor && valor.includes('9 -')) {
-                                td.style.color = '#4caf50';
-                                td.style.fontWeight = 'bold';
-                            }
-                        }
-                        
-                        if (headerName === 'QTYRECEIVED') {
+                        // Alinear números a la derecha
+                        if (['UNIDADES', 'CAJAS', 'PALLETS'].includes(headerName)) {
                             td.classList.add('text-right');
+                            if (valor === '' || valor === null || valor === undefined) {
+                                valor = '0';
+                            }
                         }
                         
                         if (typeof valor === 'string' && valor.length > 50) {
@@ -1604,7 +1602,19 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 
                 if (data.stats.total_unidades && data.stats.total_unidades !== '0') {
                     statsHtml += `<span class="badge badge-primary">
-                        <i class="fa fa-cubes"></i> Total unidades: ${data.stats.total_unidades}
+                        <i class="fa fa-cubes"></i> Unidades: ${data.stats.total_unidades}
+                    </span>`;
+                }
+                
+                if (data.stats.total_cajas && data.stats.total_cajas !== '0') {
+                    statsHtml += `<span class="badge badge-primary">
+                        <i class="fa fa-cubes"></i> Cajas: ${data.stats.total_cajas}
+                    </span>`;
+                }
+                
+                if (data.stats.total_pallets && data.stats.total_pallets !== '0') {
+                    statsHtml += `<span class="badge badge-primary">
+                        <i class="fa fa-cubes"></i> Pallets: ${data.stats.total_pallets}
                     </span>`;
                 }
                 
@@ -1623,9 +1633,13 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     document.getElementById('recepcion-bultos').textContent = stats.receiptkeys_unicos;
                 }
                 
-                if (stats.total_unidades) {
-                    document.getElementById('recepcion-proveedores').textContent = stats.total_unidades;
-                }
+                // Mostrar totales combinados
+                let totales = [];
+                if (stats.total_unidades && stats.total_unidades !== '0') totales.push(`${stats.total_unidades} Unid`);
+                if (stats.total_cajas && stats.total_cajas !== '0') totales.push(`${stats.total_cajas} Cjas`);
+                if (stats.total_pallets && stats.total_pallets !== '0') totales.push(`${stats.total_pallets} Pallets`);
+                
+                document.getElementById('recepcion-proveedores').textContent = totales.join(' + ') || '0';
                 
                 if (stats.fecha_min && stats.fecha_max) {
                     document.getElementById('recepcion-fecha').textContent = 
@@ -1670,8 +1684,21 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             mensaje += `📊 Se encontraron ${totalRegistros} registros.\n`;
             mensaje += `⏱️ Tiempo de procesamiento: ${metadata.tiempo_procesamiento || 0} segundos.\n`;
             
+            if (stats.total_unidades && stats.total_unidades !== '0') {
+                mensaje += `📦 Unidades: ${stats.total_unidades}\n`;
+            }
+            if (stats.total_cajas && stats.total_cajas !== '0') {
+                mensaje += `📦 Cajas: ${stats.total_cajas}\n`;
+            }
+            if (stats.total_pallets && stats.total_pallets !== '0') {
+                mensaje += `📦 Pallets: ${stats.total_pallets}\n`;
+            }
+            
             if (stats.filas_filtradas_cantidad > 0) {
                 mensaje += `\n⚠️ Se filtraron ${stats.filas_filtradas_cantidad} registros con cantidad cero.`;
+            }
+            if (stats.filas_filtradas_status > 0) {
+                mensaje += `\n⚠️ Se filtraron ${stats.filas_filtradas_status} registros por STATUS no válido.`;
             }
             if (stats.filas_filtradas_fecha > 0) {
                 mensaje += `\n📅 Se filtraron ${stats.filas_filtradas_fecha} registros por rango de fechas.`;

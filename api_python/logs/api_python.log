@@ -1113,3 +1113,58 @@ TypeError: Object of type int64 is not JSON serializable
 2026-02-24 16:39:17,360 - werkzeug - INFO -  * Debugger PIN: 143-932-689
 2026-02-24 16:39:18,888 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
 2026-02-24 16:39:19,057 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:39:21,179 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:39:21,182 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:39:21,233 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 16:39:21,245 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 16:39:24,227 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:39:24] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:39:31,733 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:39:31] "GET /health HTTP/1.1" 200 -
+2026-02-24 16:39:31,740 - __main__ - INFO - [20260224_163931_740699] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-24 16:39:31,925 - __main__ - INFO - [20260224_163931_740699] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_163931_740699_Export (51).xlsx (3378917 bytes)
+2026-02-24 16:39:31,926 - __main__ - INFO - [20260224_163931_740699] Filtros: desde=, hasta=
+2026-02-24 16:39:31,927 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] ===== INICIANDO PROCESAMIENTO RECEPCIÓN =====
+2026-02-24 16:39:31,927 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Archivo: C:\Users\JOHNAR~1\AppData\Local\Temp\20260224_163931_740699_Export (51).xlsx
+2026-02-24 16:39:31,927 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Filtros: fecha_desde=None, fecha_hasta=None
+2026-02-24 16:39:31,928 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Leyendo archivo Excel...
+2026-02-24 16:39:32,338 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Hojas disponibles: ['Data', 'Detail', 'Validations']
+2026-02-24 16:39:32,352 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Hoja seleccionada: 'Detail'
+2026-02-24 16:39:32,352 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Leyendo hoja 'Detail'...
+2026-02-24 16:39:52,874 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Hoja leída: 6419 filas, 148 columnas
+2026-02-24 16:39:52,945 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] DataFrame inicial: 6418 filas
+2026-02-24 16:39:52,951 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Después de limpiar vacíos: 6418 filas
+2026-02-24 16:39:53,018 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Filas filtradas por STATUS (no 11/15): 4113
+2026-02-24 16:39:53,019 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Filas después de filtro STATUS: 2305
+2026-02-24 16:39:53,020 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Procesando cantidades - extrayendo parte entera...
+2026-02-24 16:39:53,047 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Cantidades enteras extraídas - min: 0, max: 996
+2026-02-24 16:39:53,048 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Procesando fechas...
+2026-02-24 16:39:53,312 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Agrupando por RECEIPTKEY + SKU...
+2026-02-24 16:39:53,331 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Grupos únicos encontrados: 357
+2026-02-24 16:39:53,588 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Después de agrupar: 357 filas
+2026-02-24 16:39:53,588 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Reducción por agrupación: 1948 filas
+2026-02-24 16:39:53,590 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] ESTADÍSTICAS FINALES:
+2026-02-24 16:39:53,590 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699]   - Filas originales: 2305
+2026-02-24 16:39:53,590 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699]   - Filas después de agrupar: 357
+2026-02-24 16:39:53,591 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699]   - Filas filtradas por STATUS: 4113
+2026-02-24 16:39:53,592 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699]   - Filas filtradas por fecha: 0
+2026-02-24 16:39:53,592 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699]   - Registros finales: 357
+2026-02-24 16:39:53,604 - procesadores.recepcion_procesador - INFO - [20260224_163931_740699] Procesamiento completado exitosamente
+2026-02-24 16:39:53,613 - __main__ - INFO - [20260224_163931_740699] Procesamiento completado en 21.87 segundos
+2026-02-24 16:39:54,138 - __main__ - INFO - [20260224_163931_740699] Archivo temporal eliminado
+2026-02-24 16:39:54,138 - __main__ - INFO - [20260224_163931_740699] Enviando respuesta JSON exitosamente
+2026-02-24 16:39:54,220 - werkzeug - INFO - 127.0.0.1 - - [24/Feb/2026 16:39:54] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-24 16:56:25,430 - werkzeug - INFO -  * Detected change in 'C:\\xampp\\htdocs\\Portal-Facturacion\\api_python\\procesadores\\recepcion_procesador.py', reloading
+2026-02-24 16:56:25,840 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 16:56:31,602 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 16:56:31,607 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 16:56:31,709 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 16:56:31,726 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-24 17:00:24,522 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 17:00:24,524 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 17:00:24,582 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-24 17:00:24,583 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-24 17:00:24,585 - werkzeug - INFO -  * Restarting with stat
+2026-02-24 17:00:25,860 - __main__ - INFO - Procesadores importados correctamente
+2026-02-24 17:00:25,862 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-24 17:00:25,896 - werkzeug - WARNING -  * Debugger is active!
+2026-02-24 17:00:25,902 - werkzeug - INFO -  * Debugger PIN: 143-932-689
