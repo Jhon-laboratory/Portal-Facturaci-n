@@ -1,0 +1,44 @@
+Options -Indexes
+
+RewriteEngine On
+
+# NO redirigir peticiones AJAX o archivos existentes
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Redirigir .php a versión sin extensión (solo para navegación normal)
+RewriteCond %{THE_REQUEST} \s/([^.]+)\.php [NC]
+RewriteCond %{REQUEST_URI} !/controller/ [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# Cargar archivo php internamente (solo si no es una petición a controller)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteCond %{REQUEST_URI} !/controller/ [NC]
+RewriteRule ^([^\.]+)$ $1.php [L]
+
+# Configuración PHP para archivos grandes
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 500M
+    php_value post_max_size 500M
+    php_value max_execution_time 600
+    php_value max_input_time 600
+    php_value memory_limit 1024M
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 500M
+    php_value post_max_size 500M
+    php_value max_execution_time 600
+    php_value max_input_time 600
+    php_value memory_limit 1024M
+</IfModule>
+
+# Permitir CORS para peticiones AJAX
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "POST, GET, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type"
+</IfModule>
