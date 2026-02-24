@@ -3,7 +3,7 @@
 
 """
 Procesador específico para el módulo de Recepción
-VERSIÓN FINAL - Con agrupación por RECEIPTKEY+SKU, STATUS 11/15 y suma de cantidades
+VERSIÓN CORREGIDA - Con serialización JSON adecuada
 """
 
 import pandas as pd
@@ -12,7 +12,6 @@ import logging
 from datetime import datetime
 import os
 import sys
-import time
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.excel_utils import ExcelUtils
@@ -27,7 +26,6 @@ class RecepcionProcesador:
         'RECEIPTKEY': {'columna': 'C', 'tipo': 'string', 'nombre': 'ASN/Recepción'},
         'SKU': {'columna': 'D', 'tipo': 'string', 'nombre': 'Artículo'},
         'STORERKEY': {'columna': 'E', 'tipo': 'string', 'nombre': 'Propietario'},
-        # Columna D parece estar vacía o no usada, la saltamos
         'QTYRECEIVED': {'columna': 'H', 'tipo': 'float', 'nombre': 'Ctd. recibida'},
         'UOM': {'columna': 'I', 'tipo': 'string', 'nombre': 'UDM'},
         'STATUS': {'columna': 'O', 'tipo': 'string', 'nombre': 'Estatus'},
@@ -55,27 +53,55 @@ class RecepcionProcesador:
         self.nombre_modulo = 'RecepcionProcesador'
     
     def _convertir_a_serializable(self, obj):
-        """Convierte objetos numpy a tipos nativos de Python para JSON"""
-        if isinstance(obj, (np.int64, np.int32, np.int16, np.int8)):
-            return int(obj)
-        elif isinstance(obj, (np.float64, np.float32, np.float16)):
-            return float(obj)
-        elif isinstance(obj, np.bool_):
-            return bool(obj)
-        elif isinstance(obj, np.datetime64):
-            return pd.Timestamp(obj).strftime('%d/%m/%Y %H:%M')
-        elif isinstance(obj, pd.Timestamp):
-            return obj.strftime('%d/%m/%Y %H:%M')
-        elif isinstance(obj, pd.Series):
-            return obj.tolist()
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        elif pd.isna(obj):
+        """
+        Convierte objetos numpy a tipos nativos de Python para JSON
+        Versión mejorada que maneja TODOS los tipos numpy
+        """
+        # Si es None o NaN
+        if obj is None or pd.isna(obj):
             return ''
-        elif isinstance(obj, (datetime, pd.Timestamp)):
+        
+        # Manejar todos los tipos de numpy enteros
+        if isinstance(obj, (np.int8, np.int16, np.int32, np.int64)):
+            return int(obj)
+        
+        # Manejar todos los tipos de numpy flotantes
+        if isinstance(obj, (np.float16, np.float32, np.float64)):
+            # Si es un número entero, devolver como entero
+            if float(obj).is_integer():
+                return int(obj)
+            return float(obj)
+        
+        # Manejar numpy boolean
+        if isinstance(obj, np.bool_):
+            return bool(obj)
+        
+        # Manejar numpy datetime
+        if isinstance(obj, np.datetime64):
+            return pd.Timestamp(obj).strftime('%d/%m/%Y %H:%M')
+        
+        # Manejar pandas Timestamp
+        if isinstance(obj, pd.Timestamp):
             return obj.strftime('%d/%m/%Y %H:%M')
-        else:
-            return str(obj)
+        
+        # Manejar pandas Series
+        if isinstance(obj, pd.Series):
+            return obj.tolist()
+        
+        # Manejar numpy arrays
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        
+        # Manejar datetime
+        if isinstance(obj, datetime):
+            return obj.strftime('%d/%m/%Y %H:%M')
+        
+        # Si es un número pero no numpy, asegurar conversión
+        if isinstance(obj, (int, float)):
+            return obj
+        
+        # Para strings y otros tipos
+        return str(obj)
     
     def _convertir_dataframe_a_lista(self, df):
         """Convierte un DataFrame a lista de listas con tipos serializables"""
@@ -100,6 +126,10 @@ class RecepcionProcesador:
         try:
             if pd.isna(valor) or valor is None:
                 return 0
+            
+            # Si ya es número
+            if isinstance(valor, (int, float, np.integer, np.floating)):
+                return int(float(valor))
             
             # Convertir a string
             valor_str = str(valor).strip()
@@ -259,8 +289,7 @@ class RecepcionProcesador:
                 indice = self.utils.excel_col_to_index(letra)
                 
                 if indice < len(df.columns):
-                    # La primera fila (fila 1) contiene los headers, los datos empiezan en fila 2
-                    # Por eso tomamos desde la fila 1 en adelante (iloc[1:] para saltar headers)
+                    # La primera fila (fila 0) contiene los headers, los datos empiezan en fila 1
                     if len(df) > 1:
                         df_resultado[nombre] = df.iloc[1:, indice].reset_index(drop=True)
                     else:
@@ -277,75 +306,81 @@ class RecepcionProcesador:
             logger.info(f"[{request_id}] Después de limpiar vacíos: {len(df_resultado)} filas")
             
             # PASO 6: Filtrar por STATUS (solo 11 y 15)
-            if 'STATUS' in df_resultado.columns:
+            filas_filtradas_status = 0
+            if 'STATUS' in df_resultado.columns and len(df_resultado) > 0:
                 # Convertir STATUS a string para comparar
                 df_resultado['STATUS_STR'] = df_resultado['STATUS'].astype(str).str.strip()
                 
                 # Filtrar solo STATUS 11 o 15
                 mask_status = df_resultado['STATUS_STR'].isin(['11', '15'])
-                filas_filtradas_status = (~mask_status).sum()
+                filas_filtradas_status = int((~mask_status).sum())
                 df_resultado = df_resultado[mask_status].copy()
                 
                 logger.info(f"[{request_id}] Filas filtradas por STATUS (no 11/15): {filas_filtradas_status}")
                 logger.info(f"[{request_id}] Filas después de filtro STATUS: {len(df_resultado)}")
             
             # PASO 7: Procesar cantidades (extraer parte entera)
-            if 'QTYRECEIVED' in df_resultado.columns:
+            if 'QTYRECEIVED' in df_resultado.columns and len(df_resultado) > 0:
                 logger.info(f"[{request_id}] Procesando cantidades - extrayendo parte entera...")
                 
                 # Aplicar la función de extracción de parte entera
                 df_resultado['QTY_ENTERO'] = df_resultado['QTYRECEIVED'].apply(self._extraer_parte_entera)
                 
                 # Mostrar estadísticas de cantidades
-                logger.info(f"[{request_id}] Cantidades enteras extraídas - min: {df_resultado['QTY_ENTERO'].min()}, max: {df_resultado['QTY_ENTERO'].max()}")
+                if len(df_resultado) > 0:
+                    logger.info(f"[{request_id}] Cantidades enteras extraídas - min: {df_resultado['QTY_ENTERO'].min()}, max: {df_resultado['QTY_ENTERO'].max()}")
             
             # PASO 8: Procesar fechas para ordenamiento
-            if 'DATERECEIVED' in df_resultado.columns:
+            if 'DATERECEIVED' in df_resultado.columns and len(df_resultado) > 0:
                 logger.info(f"[{request_id}] Procesando fechas...")
                 df_resultado['FECHA_OBJ'] = df_resultado['DATERECEIVED'].apply(self._procesar_fecha)
             
             # PASO 9: AGRUPAR POR RECEIPTKEY + SKU
-            logger.info(f"[{request_id}] Agrupando por RECEIPTKEY + SKU...")
+            stats_agrupacion = {
+                'filas_originales': len(df_resultado) if len(df_resultado) > 0 else 0,
+                'filas_agrupadas': 0,
+                'reduccion': 0
+            }
             
-            # Función para agregar cada grupo
-            def agregar_grupo(grupo):
-                if len(grupo) == 0:
-                    return None
-                
-                # Tomar el primer registro para campos que se mantienen iguales
-                primer_registro = grupo.iloc[0]
-                
-                # Sumar las cantidades (QTY_ENTERO)
-                cantidad_total = grupo['QTY_ENTERO'].sum() if 'QTY_ENTERO' in grupo.columns else 0
-                
-                # Encontrar la fecha más reciente
-                if 'FECHA_OBJ' in grupo.columns:
-                    # Eliminar fechas nulas
-                    fechas_validas = grupo['FECHA_OBJ'].dropna()
-                    if len(fechas_validas) > 0:
-                        # Ordenar por fecha y tomar la más reciente
-                        fecha_reciente = fechas_validas.sort_values(ascending=False).iloc[0]
-                        fecha_str = fecha_reciente.strftime('%d/%m/%Y %H:%M')
-                    else:
-                        fecha_str = grupo['DATERECEIVED'].iloc[0] if 'DATERECEIVED' in grupo.columns else ''
-                else:
-                    fecha_str = grupo['DATERECEIVED'].iloc[0] if 'DATERECEIVED' in grupo.columns else ''
-                
-                # Crear registro agregado
-                return pd.Series({
-                    'RECEIPTKEY': primer_registro['RECEIPTKEY'],
-                    'SKU': primer_registro['SKU'],
-                    'STORERKEY': primer_registro['STORERKEY'] if 'STORERKEY' in grupo.columns else '',
-                    'QTYRECEIVED': cantidad_total,
-                    'UOM': primer_registro['UOM'] if 'UOM' in grupo.columns else '',
-                    'STATUS': primer_registro['STATUS'] if 'STATUS' in grupo.columns else '',
-                    'DATERECEIVED': fecha_str,
-                    'EXTERNRECEIPTKEY': primer_registro['EXTERNRECEIPTKEY'] if 'EXTERNRECEIPTKEY' in grupo.columns else '',
-                    'CANTIDAD_REGISTROS_ORIGINALES': len(grupo)  # Para estadísticas
-                })
-            
-            # Aplicar agrupación
             if len(df_resultado) > 0 and 'RECEIPTKEY' in df_resultado.columns and 'SKU' in df_resultado.columns:
+                logger.info(f"[{request_id}] Agrupando por RECEIPTKEY + SKU...")
+                
+                # Función para agregar cada grupo
+                def agregar_grupo(grupo):
+                    if len(grupo) == 0:
+                        return None
+                    
+                    # Tomar el primer registro para campos que se mantienen iguales
+                    primer_registro = grupo.iloc[0]
+                    
+                    # Sumar las cantidades (QTY_ENTERO)
+                    cantidad_total = int(grupo['QTY_ENTERO'].sum()) if 'QTY_ENTERO' in grupo.columns else 0
+                    
+                    # Encontrar la fecha más reciente
+                    fecha_str = ''
+                    if 'FECHA_OBJ' in grupo.columns:
+                        # Eliminar fechas nulas
+                        fechas_validas = grupo['FECHA_OBJ'].dropna()
+                        if len(fechas_validas) > 0:
+                            # Ordenar por fecha y tomar la más reciente
+                            fecha_reciente = fechas_validas.sort_values(ascending=False).iloc[0]
+                            fecha_str = fecha_reciente.strftime('%d/%m/%Y %H:%M')
+                        else:
+                            fecha_str = grupo['DATERECEIVED'].iloc[0] if 'DATERECEIVED' in grupo.columns else ''
+                    
+                    # Crear registro agregado
+                    return pd.Series({
+                        'RECEIPTKEY': primer_registro['RECEIPTKEY'],
+                        'SKU': primer_registro['SKU'],
+                        'STORERKEY': primer_registro['STORERKEY'] if 'STORERKEY' in grupo.columns else '',
+                        'QTYRECEIVED': cantidad_total,
+                        'UOM': primer_registro['UOM'] if 'UOM' in grupo.columns else '',
+                        'STATUS': primer_registro['STATUS'] if 'STATUS' in grupo.columns else '',
+                        'DATERECEIVED': fecha_str,
+                        'EXTERNRECEIPTKEY': primer_registro['EXTERNRECEIPTKEY'] if 'EXTERNRECEIPTKEY' in grupo.columns else '',
+                        'CANTIDAD_REGISTROS_ORIGINALES': len(grupo)
+                    })
+                
                 # Crear columna combinada para agrupar
                 df_resultado['GRUPO_KEY'] = df_resultado['RECEIPTKEY'].astype(str) + '_' + df_resultado['SKU'].astype(str)
                 
@@ -358,7 +393,6 @@ class RecepcionProcesador:
                 
                 logger.info(f"[{request_id}] Después de agrupar: {len(df_agrupado)} filas")
                 
-                # Calcular estadísticas de agrupación
                 stats_agrupacion = {
                     'filas_originales': len(df_resultado),
                     'filas_agrupadas': len(df_agrupado),
@@ -366,23 +400,22 @@ class RecepcionProcesador:
                 }
                 logger.info(f"[{request_id}] Reducción por agrupación: {stats_agrupacion['reduccion']} filas")
             else:
-                df_agrupado = df_resultado
+                df_agrupado = df_resultado if len(df_resultado) > 0 else pd.DataFrame()
                 stats_agrupacion = {
-                    'filas_originales': len(df_resultado),
-                    'filas_agrupadas': len(df_resultado),
+                    'filas_originales': len(df_resultado) if len(df_resultado) > 0 else 0,
+                    'filas_agrupadas': len(df_agrupado) if len(df_agrupado) > 0 else 0,
                     'reduccion': 0
                 }
             
             # PASO 10: Aplicar filtros de fecha (después de agrupar)
             stats_fecha = {'filas_filtradas_fecha': 0, 'fecha_min': None, 'fecha_max': None}
             
-            # Reconstruir columna de fecha para filtrado si es necesario
-            if fecha_desde or fecha_hasta:
+            if len(df_agrupado) > 0 and (fecha_desde or fecha_hasta):
                 # Necesitamos fechas en formato ISO para filtrar
                 df_agrupado['_FECHA_ISO_FILTRO'] = None
                 for idx, row in df_agrupado.iterrows():
                     fecha_val = row['DATERECEIVED']
-                    if fecha_val:
+                    if fecha_val and isinstance(fecha_val, str) and fecha_val.strip():
                         # Intentar convertir la fecha ya formateada de vuelta a objeto
                         try:
                             fecha_obj = datetime.strptime(str(fecha_val), '%d/%m/%Y %H:%M')
@@ -400,30 +433,24 @@ class RecepcionProcesador:
                 stats_fecha['filas_filtradas_fecha'] = int((~mask_fecha).sum())
                 df_agrupado = df_agrupado[mask_fecha].copy()
             
-            # PASO 11: Calcular estadísticas finales
-            total_registros_final = int(len(df_agrupado))
-            
-            # Formatear QTYRECEIVED para visualización
-            if 'QTYRECEIVED' in df_agrupado.columns:
-                df_agrupado['QTYRECEIVED'] = df_agrupado['QTYRECEIVED'].apply(
-                    lambda x: self.utils.formatear_numero(x, 0)  # 0 decimales porque ya son enteros
-                )
+            # PASO 11: Calcular estadísticas finales (TODO CONVERTIDO A TIPOS NATIVOS)
+            total_registros_final = int(len(df_agrupado)) if len(df_agrupado) > 0 else 0
             
             stats = {
-                'total_filas': total_registros_final,
-                'mostrando': min(100, total_registros_final),
-                'filas_originales': stats_agrupacion['filas_originales'],
-                'filas_agrupadas': stats_agrupacion['filas_agrupadas'],
-                'reduccion_agrupacion': stats_agrupacion['reduccion'],
-                'filas_filtradas_status': filas_filtradas_status if 'filas_filtradas_status' in locals() else 0,
+                'total_filas': int(total_registros_final),
+                'mostrando': int(min(100, total_registros_final)),
+                'filas_originales': int(stats_agrupacion['filas_originales']),
+                'filas_agrupadas': int(stats_agrupacion['filas_agrupadas']),
+                'reduccion_agrupacion': int(stats_agrupacion['reduccion']),
+                'filas_filtradas_status': int(filas_filtradas_status),
                 'filas_filtradas_fecha': int(stats_fecha['filas_filtradas_fecha']),
-                'fecha_min': stats_fecha['fecha_min'],
-                'fecha_max': stats_fecha['fecha_max'],
+                'fecha_min': self._convertir_a_serializable(stats_fecha['fecha_min']),
+                'fecha_max': self._convertir_a_serializable(stats_fecha['fecha_max']),
                 'filtros_aplicados': {
-                    'fecha_desde': fecha_desde,
-                    'fecha_hasta': fecha_hasta
+                    'fecha_desde': self._convertir_a_serializable(fecha_desde),
+                    'fecha_hasta': self._convertir_a_serializable(fecha_hasta)
                 },
-                'hoja_procesada': hoja_detail
+                'hoja_procesada': str(hoja_detail)
             }
             
             # Calcular estadísticas adicionales
@@ -438,16 +465,19 @@ class RecepcionProcesador:
                     total_qty = 0
                     for val in df_agrupado['QTYRECEIVED']:
                         try:
-                            # Limpiar formato (ej: "525,00000" -> 525)
-                            if isinstance(val, str) and ',' in val:
-                                num = int(val.split(',')[0].replace('.', ''))
-                            else:
-                                num = int(float(str(val).replace(',', '').replace('.', '')))
-                            total_qty += num
-                        except:
-                            pass
+                            if isinstance(val, (int, float, np.integer, np.floating)):
+                                total_qty += int(val)
+                            elif isinstance(val, str):
+                                if ',' in val:
+                                    num = int(val.split(',')[0].replace('.', ''))
+                                else:
+                                    num = int(float(val.replace(',', '').replace('.', '')))
+                                total_qty += num
+                        except Exception as e:
+                            logger.warning(f"Error sumando cantidad {val}: {e}")
+                            continue
                     
-                    stats['total_unidades'] = self.utils.formatear_numero(total_qty, 0)
+                    stats['total_unidades'] = self._convertir_a_serializable(total_qty)
                 else:
                     stats['total_unidades'] = '0'
             
@@ -458,17 +488,27 @@ class RecepcionProcesador:
             logger.info(f"[{request_id}]   - Filas filtradas por fecha: {stats['filas_filtradas_fecha']}")
             logger.info(f"[{request_id}]   - Registros finales: {stats['total_filas']}")
             
+            # Formatear QTYRECEIVED para visualización
+            if 'QTYRECEIVED' in df_agrupado.columns and len(df_agrupado) > 0:
+                df_agrupado['QTYRECEIVED'] = df_agrupado['QTYRECEIVED'].apply(
+                    lambda x: self.utils.formatear_numero(x, 0) if pd.notna(x) else '0'
+                )
+            
             # PASO 12: Preparar datos para vista previa
-            columnas_existentes = [col for col in self.HEADERS_MOSTRAR if col in df_agrupado.columns]
-            
-            if len(columnas_existentes) < len(self.HEADERS_MOSTRAR):
-                for col in self.HEADERS_MOSTRAR:
-                    if col not in df_agrupado.columns:
-                        df_agrupado[col] = ''
+            if len(df_agrupado) > 0:
+                columnas_existentes = [col for col in self.HEADERS_MOSTRAR if col in df_agrupado.columns]
+                
+                if len(columnas_existentes) < len(self.HEADERS_MOSTRAR):
+                    for col in self.HEADERS_MOSTRAR:
+                        if col not in df_agrupado.columns:
+                            df_agrupado[col] = ''
+                    columnas_existentes = self.HEADERS_MOSTRAR
+                
+                df_preview = df_agrupado[columnas_existentes].head(100).copy()
+                datos_preview = self._convertir_dataframe_a_lista(df_preview)
+            else:
+                datos_preview = []
                 columnas_existentes = self.HEADERS_MOSTRAR
-            
-            df_preview = df_agrupado[columnas_existentes].head(100).copy()
-            datos_preview = self._convertir_dataframe_a_lista(df_preview)
             
             # PASO 13: Generar mensajes
             mensajes = {
@@ -486,7 +526,7 @@ class RecepcionProcesador:
             
             return {
                 'success': True,
-                'total_registros': total_registros_final,
+                'total_registros': int(total_registros_final),
                 'headers': columnas_existentes,
                 'data': datos_preview,
                 'stats': stats,

@@ -136,3 +136,19 @@
   "tipo_error": "TypeError"
 }
 
+[2026-02-24 21:35:22] === Bridge PHP-Python inicializado ===
+[2026-02-24 21:35:22] Procesando archivo tipo: recepcion
+[2026-02-24 21:35:22] Archivo: Export (51).xlsx (3.22MB)
+[2026-02-24 21:35:48] Respuesta recibida en 26.04s
+[2026-02-24 21:36:11] === Bridge PHP-Python inicializado ===
+[2026-02-24 21:36:11] Procesando archivo tipo: recepcion
+[2026-02-24 21:36:11] Archivo: Export (50).xlsx (1.39MB)
+[2026-02-24 21:36:19] Respuesta recibida en 7.81s
+[2026-02-24 21:36:49] === Bridge PHP-Python inicializado ===
+[2026-02-24 21:36:49] Procesando archivo tipo: recepcion
+[2026-02-24 21:36:49] Archivo: Export (50).xlsx (1.39MB)
+[2026-02-24 21:36:57] Respuesta recibida en 7.52s
+[2026-02-24 21:39:31] === Bridge PHP-Python inicializado ===
+[2026-02-24 21:39:31] Procesando archivo tipo: recepcion
+[2026-02-24 21:39:31] Archivo: Export (51).xlsx (3.22MB)
+[2026-02-24 21:39:54] Respuesta recibida en 22.49s
