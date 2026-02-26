@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-// Incluir configuración - RUTA CORREGIDA
+// Incluir configuración
 require_once '../../conexion/config.php';
 
-// Verificar si el usuario está logueado - ACTIVADO
+// Verificar si el usuario está logueado
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../../login.php");
     exit;
@@ -31,7 +31,7 @@ $stats = [
 try {
     $conn = getDBConnection();
     
-    // Obtener datos del cliente - CORREGIDO (sin campo rfc)
+    // Obtener datos del cliente
     $query_cliente = "SELECT id, codigo_cliente, nombre_comercial, logo_png, direccion, telefono, email, nit 
                       FROM [FacBol].[clientes] 
                       WHERE codigo_cliente = :codigo";
@@ -40,46 +40,43 @@ try {
     $cliente_info = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$cliente_info) {
-        // Debug
         error_log("Cliente no encontrado con código: " . $codigo_cliente);
         header("Location: ../../dashboard.php?msg=" . urlencode("Cliente no encontrado"));
         exit;
     }
     
-    // Obtener estadísticas - CORREGIDO (sin referencias a columnas que no existen)
-    $query_stats = "SELECT 
-                        COUNT(*) as total_facturas,
-                        SUM(CASE WHEN MONTH(fecha_emision) = MONTH(GETDATE()) THEN 1 ELSE 0 END) as facturas_mes,
-                        SUM(monto_total) as monto_total
-                    FROM [FacBol].[facturas] f
-                    WHERE f.cliente_id = :cliente_id";
-    $stmt = $conn->prepare($query_stats);
-    $stmt->execute([':cliente_id' => $cliente_info['id']]);
-    $stats_data = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($stats_data) {
-        $stats = array_merge($stats, $stats_data);
-    }
-    
-    // Obtener facturas del cliente - CORREGIDO (sin campos que no existen)
+    // Obtener facturas del cliente con sus estados
     $query_facturas = "SELECT 
-                        f.id,
-                        f.nro_factura,
-                        c.nombre_comercial as cliente,
-                        f.fecha_emision,
-                        f.sede,
-                        f.estado,
-                        f.monto_total,
-                        f.moneda,
-                        f.created_at
-                       FROM [FacBol].[facturas] f
-                       INNER JOIN [FacBol].[clientes] c ON f.cliente_id = c.id
-                       WHERE c.codigo_cliente = :codigo
-                       ORDER BY f.fecha_emision DESC";
+                        fc.id,
+                        fc.id as factura_id,
+                        'FAC-' + RIGHT('00000' + CAST(fc.id AS VARCHAR), 6) as nro_factura,
+                        fc.fecha_creacion as fecha_emision,
+                        ISNULL(fc.recepcion_completado, 0) as recepcion_completado,
+                        ISNULL(fc.despacho_completado, 0) as despacho_completado,
+                        ISNULL(fc.paquete_completado, 0) as paquete_completado,
+                        ISNULL(fc.almacen_completado, 0) as almacen_completado,
+                        fc.estado,
+                        fc.recepcion_archivo,
+                        fc.despacho_archivo,
+                        fc.paquete_archivo,
+                        fc.almacen_archivo,
+                        (SELECT COUNT(*) FROM " . TABLA_RECEPCION . " WHERE factura_id = fc.id) as total_recepcion,
+                        (SELECT COUNT(*) FROM " . TABLA_DESPACHO . " WHERE factura_id = fc.id) as total_despacho,
+                        (SELECT COUNT(*) FROM " . TABLA_PAQUETE . " WHERE factura_id = fc.id) as total_paquete,
+                        (SELECT COUNT(*) FROM " . TABLA_ALMACEN . " WHERE factura_id = fc.id) as total_almacen
+                       FROM " . TABLA_FACTURAS . " fc
+                       WHERE fc.cliente_codigo = :codigo
+                       ORDER BY fc.fecha_creacion DESC";
     
     $stmt = $conn->prepare($query_facturas);
     $stmt->execute([':codigo' => $codigo_cliente]);
     $facturas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Actualizar estadísticas
+    $stats['total_facturas'] = count($facturas);
+    $stats['facturas_mes'] = count(array_filter($facturas, function($f) {
+        return date('Y-m', strtotime($f['fecha_emision'])) == date('Y-m');
+    }));
     
 } catch (Exception $e) {
     $error_db = "Error de conexión: " . $e->getMessage();
@@ -89,10 +86,40 @@ try {
 // Título de la página
 $titulo_pagina = "Facturas - " . ($cliente_info['nombre_comercial'] ?? 'Cliente');
 
-// Función para formatear moneda
-function formatMoney($amount, $currency = 'BOB') {
-    if ($amount === null) $amount = 0;
-    return number_format($amount, 2, ',', '.') . ' ' . $currency;
+// Función para determinar el estado general de la factura
+function getEstadoFactura($factura) {
+    $completados = 0;
+    $total_modulos = 4;
+    
+    if ($factura['recepcion_completado']) $completados++;
+    if ($factura['despacho_completado']) $completados++;
+    if ($factura['paquete_completado']) $completados++;
+    if ($factura['almacen_completado']) $completados++;
+    
+    if ($completados == 0) return ['Pendiente', 'badge-pendiente'];
+    if ($completados == $total_modulos) return ['Completa', 'badge-completo'];
+    return ['Parcial', 'badge-warning'];
+}
+
+// Función para obtener los módulos completados
+function getModulosCompletados($factura) {
+    $modulos = [];
+    if ($factura['recepcion_completado']) $modulos[] = 'Recepción';
+    if ($factura['despacho_completado']) $modulos[] = 'Despacho';
+    if ($factura['paquete_completado']) $modulos[] = 'Otros Servicios';
+    if ($factura['almacen_completado']) $modulos[] = 'Ocupabilidad';
+    return implode(', ', $modulos);
+}
+
+// Función para obtener el nombre amigable del módulo
+function getNombreModulo($modulo) {
+    $nombres = [
+        'recepcion' => 'Recepción',
+        'despacho' => 'Despacho',
+        'paquete' => 'Otros Servicios',
+        'almacen' => 'Ocupabilidad'
+    ];
+    return $nombres[$modulo] ?? $modulo;
 }
 ?>
 <!DOCTYPE html>
@@ -104,7 +131,7 @@ function formatMoney($amount, $currency = 'BOB') {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo $titulo_pagina; ?></title>
 
-    <!-- CSS del template -->
+    <!-- CSS -->
     <link href="../../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
     <link href="../../vendors/nprogress/nprogress.css" rel="stylesheet">
@@ -121,6 +148,7 @@ function formatMoney($amount, $currency = 'BOB') {
             --success-color: #28a745;
             --warning-color: #ffc107;
             --danger-color: #dc3545;
+            --info-color: #17a2b8;
         }
 
         body.nav-md {
@@ -128,7 +156,7 @@ function formatMoney($amount, $currency = 'BOB') {
             min-height: 100vh;
         }
 
-        /* Header de cliente mejorado */
+        /* Header de cliente */
         .cliente-header-card {
             background: white;
             border-radius: 20px;
@@ -207,7 +235,7 @@ function formatMoney($amount, $currency = 'BOB') {
             width: 20px;
         }
 
-        /* Botón de nueva factura mejorado */
+        /* Botones */
         .btn-nueva-factura {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
             color: white;
@@ -216,11 +244,12 @@ function formatMoney($amount, $currency = 'BOB') {
             border-radius: 50px;
             font-weight: 600;
             font-size: 16px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 10px;
             box-shadow: 0 5px 15px rgba(0,154,63,0.3);
             transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .btn-nueva-factura:hover {
@@ -228,10 +257,6 @@ function formatMoney($amount, $currency = 'BOB') {
             box-shadow: 0 8px 25px rgba(0,154,63,0.4);
             color: white;
             background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-        }
-
-        .btn-nueva-factura i {
-            font-size: 20px;
         }
 
         .btn-volver {
@@ -242,10 +267,85 @@ function formatMoney($amount, $currency = 'BOB') {
             border-radius: 50px;
             font-weight: 500;
             margin-left: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
         }
 
         .btn-volver:hover {
             background: #f8f9fa;
+            color: #333;
+        }
+
+        .btn-pdf {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 2px;
+        }
+
+        .btn-pdf:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-pdf i {
+            font-size: 14px;
+        }
+
+        .btn-completar {
+            background: var(--info-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin: 2px;
+        }
+
+        .btn-completar:hover {
+            background: #138496;
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-actualizar {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            margin: 2px;
+        }
+
+        .btn-actualizar:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            color: #333;
+            text-decoration: none;
         }
 
         /* Stats cards */
@@ -297,18 +397,18 @@ function formatMoney($amount, $currency = 'BOB') {
             margin: 5px 0 0;
         }
 
-        .stat-info .stat-number small {
-            font-size: 14px;
-            color: #999;
-            font-weight: 400;
-        }
-
         /* Tabla mejorada */
         .table-container {
             background: white;
             border-radius: 20px;
             padding: 20px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
         .table thead th {
@@ -316,14 +416,28 @@ function formatMoney($amount, $currency = 'BOB') {
             color: #333;
             font-weight: 600;
             border-bottom: 2px solid var(--primary-color);
+            padding: 12px;
+            white-space: nowrap;
         }
 
+        .table tbody td {
+            padding: 12px;
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Badges */
         .badge-estado {
             padding: 6px 12px;
             border-radius: 30px;
             font-size: 11px;
             font-weight: 600;
             display: inline-block;
+            white-space: nowrap;
         }
 
         .badge-completo {
@@ -344,6 +458,30 @@ function formatMoney($amount, $currency = 'BOB') {
             border: 1px solid #f5c6cb;
         }
 
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .badge-recepcion { background: #cce5ff; color: #004085; }
+        .badge-despacho { background: #d4edda; color: #155724; }
+        .badge-otrosservicios { background: #fff3cd; color: #856404; }
+        .badge-ocupabilidad { background: #e8f5e9; color: #1e7e34; }
+
+        /* Tooltip */
+        .tooltip-modulos {
+            cursor: help;
+            border-bottom: 1px dashed #999;
+        }
+
+        /* Acciones compactas */
+        .acciones-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .cliente-header-card {
@@ -360,13 +498,20 @@ function formatMoney($amount, $currency = 'BOB') {
                 justify-content: center;
             }
             
-            .btn-nueva-factura {
+            .btn-nueva-factura, .btn-volver {
                 width: 100%;
                 justify-content: center;
+                margin: 5px 0;
             }
             
             .stats-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+            
+            .acciones-container {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
             }
         }
 
@@ -459,28 +604,12 @@ function formatMoney($amount, $currency = 'BOB') {
                     </div>
                 <?php endif; ?>
 
-                <!-- HEADER DE CLIENTE MEJORADO -->
+                <!-- HEADER DE CLIENTE -->
                 <div class="cliente-header-card">
                     <div class="cliente-info-wrapper">
                         <div class="cliente-logo-container">
                             <?php
-                            // Verificar si existe cliente_info
-                            if (!empty($cliente_info) && is_array($cliente_info)) {
-                                $logo = !empty($cliente_info['logo_png']) ? $cliente_info['logo_png'] : 'arcor.png';
-                                $nombre_cliente = !empty($cliente_info['nombre_comercial']) ? $cliente_info['nombre_comercial'] : 'Cliente';
-                                $codigo_cliente_display = !empty($cliente_info['codigo_cliente']) ? $cliente_info['codigo_cliente'] : '';
-                                $nit_cliente = !empty($cliente_info['nit']) ? $cliente_info['nit'] : '';
-                                $telefono_cliente = !empty($cliente_info['telefono']) ? $cliente_info['telefono'] : '';
-                                $email_cliente = !empty($cliente_info['email']) ? $cliente_info['email'] : '';
-                            } else {
-                                $logo = 'arcor.png';
-                                $nombre_cliente = 'Cliente no encontrado';
-                                $codigo_cliente_display = '';
-                                $nit_cliente = '';
-                                $telefono_cliente = '';
-                                $email_cliente = '';
-                            }
-                            
+                            $logo = !empty($cliente_info['logo_png']) ? $cliente_info['logo_png'] : 'arcor.png';
                             $logo_path = "../../img/" . $logo;
                             if (!file_exists($logo_path)) {
                                 $logo_path = "../../img/arcor.png";
@@ -492,22 +621,14 @@ function formatMoney($amount, $currency = 'BOB') {
                             </span>
                         </div>
                         <div class="cliente-details">
-                            <h1><?php echo htmlspecialchars($nombre_cliente); ?></h1>
+                            <h1><?php echo htmlspecialchars($cliente_info['nombre_comercial'] ?? 'Cliente'); ?></h1>
                             <div class="cliente-meta">
-                                <?php if (!empty($codigo_cliente_display)): ?>
-                                    <span><i class="fa fa-barcode"></i> Código: <?php echo htmlspecialchars($codigo_cliente_display); ?></span>
+                                <span><i class="fa fa-barcode"></i> Código: <?php echo htmlspecialchars($cliente_info['codigo_cliente']); ?></span>
+                                <?php if (!empty($cliente_info['nit'])): ?>
+                                    <span><i class="fa fa-id-card"></i> NIT: <?php echo htmlspecialchars($cliente_info['nit']); ?></span>
                                 <?php endif; ?>
-                                
-                                <?php if (!empty($nit_cliente)): ?>
-                                    <span><i class="fa fa-id-card"></i> NIT: <?php echo htmlspecialchars($nit_cliente); ?></span>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($telefono_cliente)): ?>
-                                    <span><i class="fa fa-phone"></i> <?php echo htmlspecialchars($telefono_cliente); ?></span>
-                                <?php endif; ?>
-                                
-                                <?php if (!empty($email_cliente)): ?>
-                                    <span><i class="fa fa-envelope"></i> <?php echo htmlspecialchars($email_cliente); ?></span>
+                                <?php if (!empty($cliente_info['telefono'])): ?>
+                                    <span><i class="fa fa-phone"></i> <?php echo htmlspecialchars($cliente_info['telefono']); ?></span>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -515,13 +636,8 @@ function formatMoney($amount, $currency = 'BOB') {
                     <div class="cliente-actions">
                         <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>" class="btn-nueva-factura">
                             <i class="fa fa-plus-circle"></i>
-                            <span>Generar Nueva Factura</span>
-                            <i class="fa fa-chevron-right"></i>
+                            <span>Nueva Factura</span>
                         </a>
-                            <i class="fa fa-plus-circle"></i>
-                            <span>Generar Nueva Factura</span>
-                            <i class="fa fa-chevron-right"></i>
-                        </button>
                         <a href="../../dashboard.php" class="btn-volver">
                             <i class="fa fa-arrow-left"></i> Volver
                         </a>
@@ -537,7 +653,7 @@ function formatMoney($amount, $currency = 'BOB') {
                         <div class="stat-info">
                             <h3>Total Facturas</h3>
                             <div class="stat-number">
-                                <?php echo isset($stats['total_facturas']) ? number_format($stats['total_facturas']) : '0'; ?>
+                                <?php echo number_format($stats['total_facturas']); ?>
                             </div>
                         </div>
                     </div>
@@ -548,111 +664,173 @@ function formatMoney($amount, $currency = 'BOB') {
                         <div class="stat-info">
                             <h3>Este Mes</h3>
                             <div class="stat-number">
-                                <?php echo isset($stats['facturas_mes']) ? number_format($stats['facturas_mes']) : '0'; ?>
+                                <?php echo number_format($stats['facturas_mes']); ?>
                             </div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <i class="fa fa-money"></i>
+                            <i class="fa fa-cubes"></i>
                         </div>
                         <div class="stat-info">
-                            <h3>Monto Total</h3>
+                            <h3>Módulos</h3>
                             <div class="stat-number">
-                                <?php 
-                                $monto_total = isset($stats['monto_total']) ? $stats['monto_total'] : 0;
-                                echo formatMoney($monto_total); 
-                                ?>
+                                <small>Recepción, Despacho, Otros, Ocupabilidad</small>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tabla de facturas -->
+                <!-- TABLA DE FACTURAS -->
                 <div class="table-container">
-                    <table class="table table-hover" id="tablaFacturas">
+                    <table class="table" id="tablaFacturas">
                         <thead>
                             <tr>
                                 <th>N° Factura</th>
                                 <th>Fecha</th>
-                                <th>Sede</th>
                                 <th>Estado</th>
-                                <th>Monto</th>
+                                <th>Recepción</th>
+                                <th>Despacho</th>
+                                <th>Otros Servicios</th>
+                                <th>Ocupabilidad</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($facturas)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center">
+                                    <td colspan="8" class="text-center">
                                         <i class="fa fa-info-circle fa-2x text-muted"></i>
                                         <p class="mt-2">No hay facturas para este cliente</p>
                                     </td>
                                 </tr>
                             <?php else: ?>
-                                <?php foreach ($facturas as $factura): ?>
+                                <?php foreach ($facturas as $factura): 
+                                    list($estado_texto, $estado_clase) = getEstadoFactura($factura);
+                                ?>
                                 <tr>
                                     <td>
-                                        <strong><?php echo htmlspecialchars($factura['nro_factura'] ?? 'N/A'); ?></strong>
+                                        <strong><?php echo htmlspecialchars($factura['nro_factura']); ?></strong>
                                     </td>
                                     <td>
-                                        <?php 
-                                        if (!empty($factura['fecha_emision'])) {
-                                            echo date('d/m/Y', strtotime($factura['fecha_emision']));
-                                        } else {
-                                            echo 'N/A';
-                                        }
-                                        ?>
+                                        <?php echo date('d/m/Y', strtotime($factura['fecha_emision'])); ?>
                                     </td>
-                                    <td><?php echo htmlspecialchars($factura['sede'] ?? 'N/A'); ?></td>
                                     <td>
-                                        <?php
-                                        $estado = $factura['estado'] ?? 'pendiente';
-                                        $badge_class = 'badge-pendiente';
-                                        if ($estado == 'emitida') $badge_class = 'badge-completo';
-                                        if ($estado == 'anulada') $badge_class = 'badge-incompleto';
-                                        ?>
-                                        <span class="badge-estado <?php echo $badge_class; ?>">
-                                            <?php echo ucfirst($estado); ?>
+                                        <span class="badge-estado <?php echo $estado_clase; ?>">
+                                            <?php echo $estado_texto; ?>
                                         </span>
+                                        <br>
+                                        <small class="text-muted tooltip-modulos" title="<?php echo getModulosCompletados($factura); ?>">
+                                            <?php 
+                                            $completados = 0;
+                                            if ($factura['recepcion_completado']) $completados++;
+                                            if ($factura['despacho_completado']) $completados++;
+                                            if ($factura['paquete_completado']) $completados++;
+                                            if ($factura['almacen_completado']) $completados++;
+                                            echo $completados . '/4 completados';
+                                            ?>
+                                        </small>
                                     </td>
+                                    
+                                    <!-- RECEPCIÓN -->
+                                    <td class="text-center">
+                                        <?php if ($factura['recepcion_completado']): ?>
+                                            <span class="badge badge-success">
+                                                <i class="fa fa-check"></i> <?php echo $factura['total_recepcion']; ?>
+                                            </span>
+                                            <div class="acciones-container">
+                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'recepcion')">
+                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                                </button>
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=recepcion" class="btn-actualizar">
+                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                </a>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="badge badge-secondary">Pendiente</span>
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=recepcion" class="btn-completar">
+                                                <i class="fa fa-plus"></i> Completar
+                                            </a>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <!-- DESPACHO -->
+                                    <td class="text-center">
+                                        <?php if ($factura['despacho_completado']): ?>
+                                            <span class="badge badge-success">
+                                                <i class="fa fa-check"></i> <?php echo $factura['total_despacho']; ?>
+                                            </span>
+                                            <div class="acciones-container">
+                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'despacho')">
+                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                                </button>
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=despacho" class="btn-actualizar">
+                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                </a>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="badge badge-secondary">Pendiente</span>
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=despacho" class="btn-completar">
+                                                <i class="fa fa-plus"></i> Completar
+                                            </a>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <!-- OTROS SERVICIOS (antes Paquete) -->
+                                    <td class="text-center">
+                                        <?php if ($factura['paquete_completado']): ?>
+                                            <span class="badge badge-success">
+                                                <i class="fa fa-check"></i> <?php echo $factura['total_paquete']; ?>
+                                            </span>
+                                            <div class="acciones-container">
+                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'paquete')">
+                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                                </button>
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=paquete" class="btn-actualizar">
+                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                </a>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="badge badge-secondary">Pendiente</span>
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=paquete" class="btn-completar">
+                                                <i class="fa fa-plus"></i> Completar
+                                            </a>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <!-- OCUPABILIDAD (antes Almacén) -->
+                                    <td class="text-center">
+                                        <?php if ($factura['almacen_completado']): ?>
+                                            <span class="badge badge-success">
+                                                <i class="fa fa-check"></i> <?php echo $factura['total_almacen']; ?>
+                                            </span>
+                                            <div class="acciones-container">
+                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'almacen')">
+                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                                </button>
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=almacen" class="btn-actualizar">
+                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                </a>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="badge badge-secondary">Pendiente</span>
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=almacen" class="btn-completar">
+                                                <i class="fa fa-plus"></i> Completar
+                                            </a>
+                                        <?php endif; ?>
+                                    </td>
+                                    
+                                    <!-- ACCIONES GENERALES -->
                                     <td>
-                                        <strong><?php echo formatMoney($factura['monto_total'] ?? 0, $factura['moneda'] ?? 'BOB'); ?></strong>
+                                        <button class="btn btn-sm btn-info" onclick="verResumen(<?php echo $factura['factura_id']; ?>)">
+                                            <i class="fa fa-eye"></i> Resumen
+                                        </button>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php endif; ?>
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- MODAL PARA NUEVA FACTURA (simplificado por ahora) -->
-            <div class="modal fade" id="modalNuevaFactura" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">
-                                <i class="fa fa-file-excel-o"></i> Generar Nueva Factura
-                            </h4>
-                            <button type="button" class="close" data-dismiss="modal">
-                                <span>&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p class="text-center">
-                                <i class="fa fa-info-circle fa-3x text-info"></i>
-                            </p>
-                            <p class="text-center">
-                                Funcionalidad en desarrollo.<br>
-                                Próximamente podrás generar facturas desde aquí.
-                            </p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                <i class="fa fa-times"></i> Cerrar
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -663,6 +841,33 @@ function formatMoney($amount, $currency = 'BOB') {
                     <span class="text-muted">v2.0</span>
                 </div>
             </footer>
+        </div>
+    </div>
+
+    <!-- MODAL DE RESUMEN -->
+    <div class="modal fade" id="modalResumen" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--primary-color); color: white;">
+                    <h4 class="modal-title">
+                        <i class="fa fa-file-text"></i> Resumen de Factura
+                    </h4>
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="resumenContent">
+                    <p class="text-center">
+                        <i class="fa fa-spinner fa-spin fa-3x"></i><br>
+                        Cargando resumen...
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fa fa-times"></i> Cerrar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -685,6 +890,35 @@ function formatMoney($amount, $currency = 'BOB') {
                 responsive: true
             });
         });
+
+        // Función para generar PDF
+        function generarPDF(factura_id, modulo) {
+            let moduloNombre = '';
+            switch(modulo) {
+                case 'recepcion': moduloNombre = 'Recepción'; break;
+                case 'despacho': moduloNombre = 'Despacho'; break;
+                case 'paquete': moduloNombre = 'Otros Servicios'; break;
+                case 'almacen': moduloNombre = 'Ocupabilidad'; break;
+            }
+            window.open('generar_pdf.php?factura_id=' + factura_id + '&modulo=' + modulo, '_blank');
+        }
+
+        // Función para ver resumen
+        function verResumen(factura_id) {
+            $('#modalResumen').modal('show');
+            
+            $.ajax({
+                url: 'resumen_factura.php',
+                method: 'GET',
+                data: { factura_id: factura_id },
+                success: function(response) {
+                    $('#resumenContent').html(response);
+                },
+                error: function() {
+                    $('#resumenContent').html('<p class="text-center text-danger">Error al cargar el resumen</p>');
+                }
+            });
+        }
 
         // Toggle del menú
         document.getElementById('menu_toggle').addEventListener('click', function() {

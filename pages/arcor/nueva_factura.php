@@ -10,16 +10,20 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Obtener el cliente de la URL
+// Obtener parámetros de la URL
 $codigo_cliente = isset($_GET['cliente']) ? $_GET['cliente'] : '';
+$factura_id = isset($_GET['factura_id']) ? intval($_GET['factura_id']) : 0;
+$modulo_activo = isset($_GET['modulo']) ? $_GET['modulo'] : '';
 
 if (empty($codigo_cliente)) {
     header("Location: ../../dashboard.php");
     exit;
 }
 
-// Obtener información del cliente
+// Obtener información del cliente y factura
 $cliente_info = [];
+$factura_info = [];
+$modulos_completados = [];
 
 try {
     $conn = getDBConnection();
@@ -37,13 +41,63 @@ try {
         exit;
     }
     
+
+    
+    // Si hay factura_id, obtener información de la factura
+    if ($factura_id > 0) {
+        $query_factura = "SELECT id, recepcion_completado, despacho_completado, 
+                                 paquete_completado, almacen_completado
+                          FROM " . TABLA_FACTURAS . "
+                          WHERE id = :id AND cliente_codigo = :cliente";
+        $stmt = $conn->prepare($query_factura);
+        $stmt->execute([':id' => $factura_id, ':cliente' => $codigo_cliente]);
+        $factura_info = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($factura_info) {
+            // Determinar qué módulos ya están completados
+            if ($factura_info['recepcion_completado']) $modulos_completados[] = 'recepcion';
+            if ($factura_info['despacho_completado']) $modulos_completados[] = 'despacho';
+            if ($factura_info['paquete_completado']) $modulos_completados[] = 'paquete';
+            if ($factura_info['almacen_completado']) $modulos_completados[] = 'almacen';
+        } else {
+            // Si la factura no existe, redirigir al index
+            header("Location: index.php?cliente=" . urlencode($codigo_cliente) . "&msg=" . urlencode("Factura no encontrada"));
+            exit;
+        }
+    }
+    
 } catch (Exception $e) {
     $error_db = "Error de conexión: " . $e->getMessage();
     error_log("Error en nueva_factura.php: " . $e->getMessage());
 }
 
-// Título de la página
-$titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cliente');
+// Determinar el título según la acción
+$accion = 'Actualizar'; // Siempre será Actualizar porque ya tenemos factura_id
+$modulo_nombre = '';
+switch($modulo_activo) {
+    case 'recepcion': $modulo_nombre = 'Recepción'; break;
+    case 'despacho': $modulo_nombre = 'Despacho'; break;
+    case 'paquete': $modulo_nombre = 'Otros Servicios'; break;
+    case 'almacen': $modulo_nombre = 'Ocupabilidad'; break;
+    default: $modulo_nombre = 'Completa';
+}
+
+$titulo_pagina = "Factura FAC-" . str_pad($factura_id, 6, '0', STR_PAD_LEFT) . " - $modulo_nombre - " . ($cliente_info['nombre_comercial'] ?? 'Cliente');
+
+// Función para determinar si un módulo debe mostrarse
+function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
+    // Si es el módulo activo, siempre se muestra
+    if ($modulo === $modulo_activo) return true;
+    
+    // Si no hay módulo activo (vista general), se muestran todos los pendientes
+    if (empty($modulo_activo)) {
+        // Mostrar solo si NO está completado
+        return !in_array($modulo, $modulos_completados);
+    }
+    
+    // Si hay módulo activo, solo se muestra ese
+    return false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -106,6 +160,41 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             color: #666;
         }
 
+        /* Info de factura */
+        .factura-info {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            border: 1px solid var(--primary-color);
+        }
+
+        .factura-info .badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .factura-info span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modulo-activo {
+            background: #ffc107;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
         /* Título de sección */
         .section-title {
             margin: 30px 0 20px;
@@ -123,7 +212,7 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
         /* Grid de módulos */
         .modulos-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(<?php echo empty($modulo_activo) ? '2' : '1'; ?>, 1fr);
             gap: 25px;
             margin-bottom: 30px;
         }
@@ -144,6 +233,16 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0,154,63,0.15);
             border-color: var(--primary-color);
+        }
+
+        .modulo-card.completado {
+            opacity: 0.6;
+            background: #f5f5f5;
+            border-color: #28a745;
+        }
+
+        .modulo-card.completado .modulo-header {
+            border-bottom-color: #28a745;
         }
 
         .modulo-header {
@@ -178,6 +277,15 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             margin: 5px 0 0;
             color: #666;
             font-size: 13px;
+        }
+
+        .badge-completado {
+            background: #28a745;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            margin-left: 10px;
         }
 
         /* Upload area */
@@ -649,10 +757,37 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             color: #004085;
         }
 
+        /* Modal de progreso */
+        .modal-progress {
+            text-align: center;
+        }
+
+        .modal-progress .fa-spinner {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .progress-bar-custom {
+            height: 25px;
+            background-color: #f0f0f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #00c851);
+            transition: width 0.3s ease;
+            color: white;
+            line-height: 25px;
+            font-size: 12px;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .modulos-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr !important;
             }
             
             .data-grid {
@@ -716,7 +851,7 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     <div class="navbar nav_title" style="border: 0;">
                         <a href="../../dashboard.php" class="site_title">
                             <img src="../../img/logo.png" alt="RANSA Logo" style="height: 32px;">
-                            <span style="font-size: 12px;">Nueva Factura</span>
+                            <span style="font-size: 12px;"><?php echo $accion; ?> Factura</span>
                         </a>
                     </div>
                     <div class="clearfix"></div>
@@ -779,11 +914,20 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     </div>
                 </div>
 
+                <?php if ($factura_id > 0): ?>
+                <!-- Info de factura -->
+                <div class="factura-info">
+                    <span class="badge">Factura # FAC-<?php echo str_pad($factura_id, 6, '0', STR_PAD_LEFT); ?></span>
+                    <span><i class="fa fa-cube"></i> Módulo activo: <strong class="modulo-activo"><?php echo $modulo_nombre; ?></strong></span>
+                    <span><i class="fa fa-check-circle text-success"></i> Módulos completados: <?php echo count($modulos_completados); ?>/4</span>
+                </div>
+                <?php endif; ?>
+
                 <!-- Progress bar general -->
                 <div class="progress-general">
                     <div class="progress-stats">
-                        <span><i class="fa fa-file-excel-o"></i> Archivos subidos: <span id="archivosSubidos">0</span>/4</span>
-                        <span><i class="fa fa-check-circle"></i> Procesados: <span id="archivosProcesados">0</span>/4</span>
+                        <span><i class="fa fa-file-excel-o"></i> Archivos subidos: <span id="archivosSubidos">0</span>/<?php echo empty($modulo_activo) ? '4' : '1'; ?></span>
+                        <span><i class="fa fa-check-circle"></i> Procesados: <span id="archivosProcesados">0</span>/<?php echo empty($modulo_activo) ? '4' : '1'; ?></span>
                     </div>
                     <div class="progress-bar-custom">
                         <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
@@ -793,13 +937,14 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 <!-- Título -->
                 <h2 class="section-title">
                     <i class="fa fa-cubes"></i> 
-                    Módulos de Carga de Archivos
+                    <?php echo empty($modulo_activo) ? 'Módulos de Carga de Archivos' : "Cargar Archivo - $modulo_nombre"; ?>
                 </h2>
 
-                <!-- Grid de 4 módulos -->
+                <!-- Grid de módulos -->
                 <div class="modulos-grid">
                     <!-- MÓDULO 1: DESPACHO -->
-                    <div class="modulo-card" id="modulo-despacho">
+                    <?php if (debeMostrarModulo('despacho', $modulo_activo, $modulos_completados)): ?>
+                    <div class="modulo-card <?php echo in_array('despacho', $modulos_completados) && $modulo_activo != 'despacho' ? 'completado' : ''; ?>" id="modulo-despacho">
                         <div class="modulo-header">
                             <div class="modulo-icon">
                                 <i class="fa fa-truck"></i>
@@ -808,8 +953,12 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                                 <h3>Módulo de Despacho</h3>
                                 <p>Archivo Excel con información de despachos</p>
                             </div>
+                            <?php if (in_array('despacho', $modulos_completados) && $modulo_activo != 'despacho'): ?>
+                                <span class="badge-completado"><i class="fa fa-check"></i> Completado</span>
+                            <?php endif; ?>
                         </div>
                         
+                        <?php if (!in_array('despacho', $modulos_completados) || $modulo_activo == 'despacho'): ?>
                         <div class="upload-area" onclick="document.getElementById('file-despacho').click()">
                             <i class="fa fa-cloud-upload"></i>
                             <p>Haz clic para seleccionar archivo</p>
@@ -855,10 +1004,13 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                         <button class="btn-procesar-modulo" id="btn-procesar-despacho" onclick="mostrarVistaPrevia('despacho')" disabled>
                             <i class="fa fa-cogs"></i> Procesar Archivo
                         </button>
+                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
 
                     <!-- MÓDULO 2: RECEPCIÓN -->
-                    <div class="modulo-card" id="modulo-recepcion">
+                    <?php if (debeMostrarModulo('recepcion', $modulo_activo, $modulos_completados)): ?>
+                    <div class="modulo-card <?php echo in_array('recepcion', $modulos_completados) && $modulo_activo != 'recepcion' ? 'completado' : ''; ?>" id="modulo-recepcion">
                         <div class="modulo-header">
                             <div class="modulo-icon">
                                 <i class="fa fa-check-circle"></i>
@@ -867,8 +1019,12 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                                 <h3>Módulo de Recepción</h3>
                                 <p>Archivo Excel con información de recepciones</p>
                             </div>
+                            <?php if (in_array('recepcion', $modulos_completados) && $modulo_activo != 'recepcion'): ?>
+                                <span class="badge-completado"><i class="fa fa-check"></i> Completado</span>
+                            <?php endif; ?>
                         </div>
                         
+                        <?php if (!in_array('recepcion', $modulos_completados) || $modulo_activo == 'recepcion'): ?>
                         <div class="upload-area" onclick="document.getElementById('file-recepcion').click()">
                             <i class="fa fa-cloud-upload"></i>
                             <p>Haz clic para seleccionar archivo</p>
@@ -914,79 +1070,71 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                         <button class="btn-procesar-modulo" id="btn-procesar-recepcion" onclick="mostrarVistaPrevia('recepcion')" disabled>
                             <i class="fa fa-cogs"></i> Procesar Archivo
                         </button>
+                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
 
-                    <!-- MÓDULO 3: PAQUETE -->
-                    <div class="modulo-card" id="modulo-paquete">
+                    <!-- MÓDULO 3: OTROS SERVICIOS (ACTUALIZADO) -->
+                    <?php if (debeMostrarModulo('paquete', $modulo_activo, $modulos_completados)): ?>
+                    <div class="modulo-card <?php echo in_array('paquete', $modulos_completados) && $modulo_activo != 'paquete' ? 'completado' : ''; ?>" id="modulo-paquete">
                         <div class="modulo-header">
                             <div class="modulo-icon">
                                 <i class="fa fa-cube"></i>
                             </div>
                             <div class="modulo-titulo">
-                                <h3>Módulo de Paquete</h3>
-                                <p>Archivo Excel con información de paquetes</p>
+                                <h3>Otros Servicios</h3>
+                                <p>Gestión de servicios adicionales y tarifas</p>
                             </div>
+                            <?php if (in_array('paquete', $modulos_completados) && $modulo_activo != 'paquete'): ?>
+                                <span class="badge-completado"><i class="fa fa-check"></i> Completado</span>
+                            <?php endif; ?>
                         </div>
                         
-                        <div class="upload-area" onclick="document.getElementById('file-paquete').click()">
-                            <i class="fa fa-cloud-upload"></i>
-                            <p>Haz clic para seleccionar archivo</p>
-                            <small>Formatos: .xls, .xlsx, .csv (Max: 100MB)</small>
-                            <input type="file" id="file-paquete" name="archivo_paquete" style="display: none;" accept=".xls,.xlsx,.csv" onchange="habilitarBotonProcesar('paquete')">
-                        </div>
-
-                        <div class="file-info" id="info-paquete" style="display: none;">
-                            <div class="file-details">
-                                <i class="fa fa-file-excel-o"></i>
-                                <div>
-                                    <div class="file-name" id="nombre-paquete"></div>
-                                    <div class="file-size" id="size-paquete"></div>
-                                </div>
-                            </div>
-                            <button class="btn-remove" onclick="eliminarArchivo('paquete')">
-                                <i class="fa fa-times"></i>
-                            </button>
+                        <?php if (!in_array('paquete', $modulos_completados) || $modulo_activo == 'paquete'): ?>
+                        <div class="upload-area" onclick="abrirModalOtrosServicios()">
+                            <i class="fa fa-calculator"></i>
+                            <p>Haz clic para gestionar servicios</p>
+                            <small>Configura servicios, tarifas y cantidades</small>
                         </div>
 
                         <div class="data-extracted" id="data-paquete" style="display: none;">
-                            <h4><i class="fa fa-database"></i> Datos Extraídos</h4>
+                            <h4><i class="fa fa-database"></i> Resumen de Servicios</h4>
                             <div class="data-grid">
                                 <div class="data-item">
-                                    <span class="label">Total Paquetes</span>
-                                    <span class="value" id="paquete-total">-</span>
-                                </div>
-                                <div class="data-item">
-                                    <span class="label">Volumen Total</span>
+                                    <span class="label">Total Servicios</span>
                                     <span class="value" id="paquete-volumen">-</span>
                                 </div>
                                 <div class="data-item">
-                                    <span class="label">Tipo</span>
-                                    <span class="value" id="paquete-tipo">-</span>
-                                </div>
-                                <div class="data-item">
-                                    <span class="label">Peso Unitario</span>
-                                    <span class="value" id="paquete-peso">-</span>
+                                    <span class="label">Total Monto</span>
+                                    <span class="value" id="paquete-total">Bs 0,00</span>
                                 </div>
                             </div>
                         </div>
 
-                        <button class="btn-procesar-modulo" id="btn-procesar-paquete" onclick="mostrarVistaPrevia('paquete')" disabled>
-                            <i class="fa fa-cogs"></i> Procesar Archivo
+                        <button class="btn-procesar-modulo" id="btn-procesar-paquete" onclick="abrirModalOtrosServicios()" style="background: #17a2b8;">
+                            <i class="fa fa-cogs"></i> Gestionar Servicios
                         </button>
+                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
 
-                    <!-- MÓDULO 4: ALMACENAMIENTO -->
-                    <div class="modulo-card" id="modulo-almacen">
+                    <!-- MÓDULO 4: ALMACENAMIENTO (Ocupabilidad) -->
+                    <?php if (debeMostrarModulo('almacen', $modulo_activo, $modulos_completados)): ?>
+                    <div class="modulo-card <?php echo in_array('almacen', $modulos_completados) && $modulo_activo != 'almacen' ? 'completado' : ''; ?>" id="modulo-almacen">
                         <div class="modulo-header">
                             <div class="modulo-icon">
                                 <i class="fa fa-archive"></i>
                             </div>
                             <div class="modulo-titulo">
-                                <h3>Módulo de Almacenamiento</h3>
+                                <h3>Módulo de Ocupabilidad</h3>
                                 <p>Archivo Excel con información de almacenes</p>
                             </div>
+                            <?php if (in_array('almacen', $modulos_completados) && $modulo_activo != 'almacen'): ?>
+                                <span class="badge-completado"><i class="fa fa-check"></i> Completado</span>
+                            <?php endif; ?>
                         </div>
                         
+                        <?php if (!in_array('almacen', $modulos_completados) || $modulo_activo == 'almacen'): ?>
                         <div class="upload-area" onclick="document.getElementById('file-almacen').click()">
                             <i class="fa fa-cloud-upload"></i>
                             <p>Haz clic para seleccionar archivo</p>
@@ -1032,7 +1180,9 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                         <button class="btn-procesar-modulo" id="btn-procesar-almacen" onclick="mostrarVistaPrevia('almacen')" disabled>
                             <i class="fa fa-cogs"></i> Procesar Archivo
                         </button>
+                        <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Barra de acciones -->
@@ -1040,9 +1190,11 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     <a href="index.php?cliente=<?php echo urlencode($codigo_cliente); ?>" class="btn-cancelar">
                         <i class="fa fa-times"></i> Cancelar
                     </a>
+                    <?php if (empty($modulo_activo)): ?>
                     <button class="btn-generar-factura" onclick="generarFactura()">
                         <i class="fa fa-file-text"></i> Generar Factura Completa
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -1062,9 +1214,9 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- SECCIÓN DE FILTROS DE FECHA -->
+                    <!-- SECCIÓN DE FILTROS DE FECHA (AHORA PARA RECEPCIÓN Y DESPACHO) -->
                     <div class="filter-section" id="filterSection" style="display: none;">
-                        <h5><i class="fa fa-calendar"></i> Filtrar por fecha de recepción</h5>
+                        <h5 id="filterTitle"><i class="fa fa-calendar"></i> Filtrar por fecha</h5>
                         <div class="filter-controls">
                             <div class="filter-item">
                                 <label>Fecha desde</label>
@@ -1165,19 +1317,116 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
         // Variables globales
         let archivosSubidos = 0;
         let archivosProcesados = 0;
-        const totalModulos = 4;
+        const totalModulos = <?php echo empty($modulo_activo) ? '4' : '1'; ?>;
         let moduloActual = '';
-        let datosProcesados = {};
+        let datosProcesados = {
+            factura_id: <?php echo $factura_id ?: 'null'; ?>
+        };
         let filtrosActuales = {
             fecha_desde: '',
             fecha_hasta: ''
         };
+        let checkProgressInterval = null;
+
+        // Función para mostrar modal de progreso
+        function mostrarModalProgreso(titulo, totalRegistros) {
+            const modalId = 'modalProgreso-' + Date.now();
+            const modalHtml = `
+                <div class="modal fade" id="${modalId}" data-backdrop="static" data-keyboard="false" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background: var(--primary-color); color: white;">
+                                <h5 class="modal-title">
+                                    <i class="fa fa-save"></i> ${titulo}
+                                </h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center mb-3">
+                                    <i class="fa fa-spinner fa-spin fa-3x" style="color: var(--primary-color);"></i>
+                                </div>
+                                <p class="text-center" id="progresoMensaje-${modalId}">
+                                    Iniciando proceso de guardado...
+                                </p>
+                                <div class="progress" style="height: 25px;">
+                                    <div id="progresoBarra-${modalId}" 
+                                         class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         role="progressbar" 
+                                         style="width: 0%; background: linear-gradient(90deg, #009a3f, #00c851);">
+                                        0%
+                                    </div>
+                                </div>
+                                <div class="row mt-3 text-center">
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fa fa-database"></i> 
+                                            <span id="progresoActual-${modalId}">0</span> / <span id="progresoTotal-${modalId}">${totalRegistros}</span>
+                                        </small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">
+                                            <i class="fa fa-clock-o"></i> 
+                                            <span id="progresoTiempo-${modalId}">0</span>s
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="alert alert-danger mt-3" id="progresoError-${modalId}" style="display: none;">
+                                    <i class="fa fa-exclamation-triangle"></i> 
+                                    <span id="progresoErrorMsg-${modalId}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('body').append(modalHtml);
+            $(`#${modalId}`).modal('show');
+            
+            return {
+                id: modalId,
+                actualizar: function(porcentaje, mensaje, actual = null) {
+                    const barra = document.getElementById(`progresoBarra-${modalId}`);
+                    const mensajeEl = document.getElementById(`progresoMensaje-${modalId}`);
+                    const actualEl = document.getElementById(`progresoActual-${modalId}`);
+                    const tiempoEl = document.getElementById(`progresoTiempo-${modalId}`);
+                    
+                    if (barra) {
+                        barra.style.width = porcentaje + '%';
+                        barra.textContent = porcentaje + '%';
+                    }
+                    if (mensajeEl) mensajeEl.textContent = mensaje;
+                    if (actualEl && actual !== null) actualEl.textContent = actual;
+                    
+                    // Actualizar tiempo transcurrido
+                    if (tiempoEl) {
+                        const segundos = Math.floor((Date.now() - startTime) / 1000);
+                        tiempoEl.textContent = segundos;
+                    }
+                },
+                error: function(mensaje) {
+                    const errorDiv = document.getElementById(`progresoError-${modalId}`);
+                    const errorMsg = document.getElementById(`progresoErrorMsg-${modalId}`);
+                    if (errorDiv && errorMsg) {
+                        errorMsg.textContent = mensaje;
+                        errorDiv.style.display = 'block';
+                    }
+                    const spinner = document.querySelector(`#${modalId} .fa-spinner`);
+                    if (spinner) {
+                        spinner.className = 'fa fa-exclamation-triangle fa-3x';
+                        spinner.style.color = '#dc3545';
+                    }
+                },
+                cerrar: function() {
+                    $(`#${modalId}`).modal('hide');
+                    setTimeout(() => $(`#${modalId}`).remove(), 500);
+                }
+            };
+        }
 
         // Verificar API Python al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
             verificarApiPython();
             
-            // Establecer valores por defecto (últimos 30 días)
             const hoy = new Date();
             const hace30Dias = new Date();
             hace30Dias.setDate(hoy.getDate() - 30);
@@ -1186,7 +1435,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             document.getElementById('filtro-fecha-hasta').value = formatFechaInput(hoy);
         });
 
-        // Función para establecer rangos predefinidos
         function setRango(rango) {
             const hoy = new Date();
             let fechaDesde, fechaHasta;
@@ -1224,12 +1472,9 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             
             document.getElementById('filtro-fecha-desde').value = formatFechaInput(fechaDesde);
             document.getElementById('filtro-fecha-hasta').value = formatFechaInput(fechaHasta);
-            
-            // Aplicar filtro automáticamente
             aplicarFiltroFecha();
         }
 
-        // Función para formatear fecha para input type="date"
         function formatFechaInput(date) {
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1237,22 +1482,16 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             return `${year}-${month}-${day}`;
         }
 
-        // Función para formatear fecha con hora para enviar al backend
         function formatFechaConHora(fecha, tipo = 'inicio') {
             if (!fecha) return '';
-            
-            // Si ya tiene hora, devolver como está
             if (fecha.includes(' ')) return fecha;
-            
-            // Agregar hora según el tipo
             if (tipo === 'inicio') {
-                return `${fecha} 00:00:00`; // Para fecha desde
+                return `${fecha} 00:00:00`;
             } else {
-                return `${fecha} 23:59:59`; // Para fecha hasta
+                return `${fecha} 23:59:59`;
             }
         }
 
-        // Verificar API Python al cargar la página
         function verificarApiPython() {
             fetch('http://127.0.0.1:5000/health')
                 .then(response => response.json())
@@ -1277,12 +1516,10 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     warning.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
                     warning.innerHTML = '<i class="fa fa-exclamation-triangle"></i> Python API no disponible. Ejecuta: python api_python/app.py';
                     document.body.appendChild(warning);
-                    
                     setTimeout(() => warning.remove(), 8000);
                 });
         }
 
-        // Función para mostrar notificaciones toast
         function mostrarNotificacion(mensaje, tipo = 'success') {
             let toast = document.getElementById('notification-toast');
             if (!toast) {
@@ -1330,7 +1567,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             }, 5000);
         }
 
-        // Función para habilitar botón de procesar
         function habilitarBotonProcesar(tipo) {
             const fileInput = document.getElementById(`file-${tipo}`);
             const btnProcesar = document.getElementById(`btn-procesar-${tipo}`);
@@ -1345,7 +1581,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             }
         }
 
-        // Función para mostrar información del archivo
         function mostrarInfoArchivo(tipo) {
             const fileInput = document.getElementById(`file-${tipo}`);
             const file = fileInput.files[0];
@@ -1368,7 +1603,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             actualizarContador();
         }
 
-        // Función para eliminar archivo
         function eliminarArchivo(tipo) {
             document.getElementById(`file-${tipo}`).value = '';
             document.getElementById(`info-${tipo}`).style.display = 'none';
@@ -1381,13 +1615,13 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             actualizarContador();
         }
 
-        // Función para actualizar contadores
         function actualizarContador() {
             archivosSubidos = 0;
             const tipos = ['despacho', 'recepcion', 'paquete', 'almacen'];
             
             tipos.forEach(tipo => {
-                if (document.getElementById(`file-${tipo}`).files.length > 0) {
+                const fileInput = document.getElementById(`file-${tipo}`);
+                if (fileInput && fileInput.files.length > 0) {
                     archivosSubidos++;
                 }
             });
@@ -1399,26 +1633,22 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             document.getElementById('progressFill').style.width = porcentaje + '%';
         }
 
-        // Función para aplicar filtro de fecha
         function aplicarFiltroFecha() {
-    const fechaDesde = document.getElementById('filtro-fecha-desde').value;
-    const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
-    
-    if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
-        mostrarNotificacion('La fecha "desde" no puede ser mayor que la fecha "hasta"', 'warning');
-        return;
-    }
-    
-    // Enviar SOLO la fecha (el backend ya maneja la hora)
-    filtrosActuales.fecha_desde = fechaDesde;  // SOLO YYYY-MM-DD
-    filtrosActuales.fecha_hasta = fechaHasta;  // SOLO YYYY-MM-DD
-    
-    console.log('Filtros aplicados:', filtrosActuales);
-    
-    mostrarVistaPrevia(moduloActual);
-}
+            const fechaDesde = document.getElementById('filtro-fecha-desde').value;
+            const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
+            
+            if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
+                mostrarNotificacion('La fecha "desde" no puede ser mayor que la fecha "hasta"', 'warning');
+                return;
+            }
+            
+            filtrosActuales.fecha_desde = fechaDesde;
+            filtrosActuales.fecha_hasta = fechaHasta;
+            
+            console.log('Filtros aplicados:', filtrosActuales);
+            mostrarVistaPrevia(moduloActual);
+        }
 
-        // Función para limpiar filtro de fecha
         function limpiarFiltroFecha() {
             document.getElementById('filtro-fecha-desde').value = '';
             document.getElementById('filtro-fecha-hasta').value = '';
@@ -1427,7 +1657,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             mostrarVistaPrevia(moduloActual);
         }
 
-        // Función para actualizar información de rango de fechas
         function actualizarInfoRangoFechas(stats) {
             const rangoMin = document.getElementById('rango-min');
             const rangoMax = document.getElementById('rango-max');
@@ -1447,15 +1676,14 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     statsHtml += `<span class="filter-stat-badge"><i class="fa fa-calendar-times-o"></i> ${stats.filas_filtradas_fecha} filtrados por fecha</span>`;
                 }
                 
-                // Mostrar filtros activos de forma más amigable
                 if (filtrosActuales.fecha_desde || filtrosActuales.fecha_hasta) {
                     let filtroTexto = '';
                     if (filtrosActuales.fecha_desde && filtrosActuales.fecha_hasta) {
-                        filtroTexto = `${filtrosActuales.fecha_desde.split(' ')[0]} - ${filtrosActuales.fecha_hasta.split(' ')[0]}`;
+                        filtroTexto = `${filtrosActuales.fecha_desde} - ${filtrosActuales.fecha_hasta}`;
                     } else if (filtrosActuales.fecha_desde) {
-                        filtroTexto = `Desde ${filtrosActuales.fecha_desde.split(' ')[0]}`;
+                        filtroTexto = `Desde ${filtrosActuales.fecha_desde}`;
                     } else if (filtrosActuales.fecha_hasta) {
-                        filtroTexto = `Hasta ${filtrosActuales.fecha_hasta.split(' ')[0]}`;
+                        filtroTexto = `Hasta ${filtrosActuales.fecha_hasta}`;
                     }
                     
                     if (filtroTexto) {
@@ -1467,12 +1695,12 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             }
         }
 
-        // Función para mostrar vista previa con Python
+        // Función para mostrar vista previa con Python (AHORA CON FILTROS PARA DESPACHO)
         function mostrarVistaPrevia(tipo) {
             moduloActual = tipo;
             
             const fileInput = document.getElementById(`file-${tipo}`);
-            if (!fileInput.files[0]) {
+            if (!fileInput || !fileInput.files[0]) {
                 mostrarNotificacion('Debe seleccionar un archivo primero', 'warning');
                 return;
             }
@@ -1487,15 +1715,22 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             const titulos = {
                 despacho: 'Despachos',
                 recepcion: 'Recepciones',
-                paquete: 'Paquetes',
-                almacen: 'Almacenamiento'
+                paquete: 'Otros Servicios',
+                almacen: 'Ocupabilidad'
             };
             
             document.getElementById('modal-titulo-modulo').textContent = titulos[tipo];
             
+            // ===== NUEVO: Mostrar filtros para DESPACHO también =====
             const filterSection = document.getElementById('filterSection');
+            const filterTitle = document.getElementById('filterTitle');
+            
             if (tipo === 'recepcion') {
                 filterSection.style.display = 'block';
+                filterTitle.innerHTML = '<i class="fa fa-calendar"></i> Filtrar por fecha de recepción';
+            } else if (tipo === 'despacho') {
+                filterSection.style.display = 'block';
+                filterTitle.innerHTML = '<i class="fa fa-calendar"></i> Filtrar por fecha de despacho';
             } else {
                 filterSection.style.display = 'none';
             }
@@ -1516,18 +1751,20 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             // Enviar las fechas con hora al backend
             if (filtrosActuales.fecha_desde) {
                 formData.append('fecha_desde', filtrosActuales.fecha_desde);
-                console.log('Enviando fecha_desde (con hora):', filtrosActuales.fecha_desde);
+                console.log('Enviando fecha_desde:', filtrosActuales.fecha_desde);
             }
             if (filtrosActuales.fecha_hasta) {
                 formData.append('fecha_hasta', filtrosActuales.fecha_hasta);
-                console.log('Enviando fecha_hasta (con hora):', filtrosActuales.fecha_hasta);
+                console.log('Enviando fecha_hasta:', filtrosActuales.fecha_hasta);
             }
             
             let controllerUrl = '';
             if (tipo === 'recepcion') {
                 controllerUrl = '../../controller/arcor/recepcion_python.php';
+            } else if (tipo === 'despacho') {
+                controllerUrl = '../../controller/arcor/despacho_python.php';
             } else {
-                mostrarNotificacion('El módulo de ' + tipo + ' estará disponible próximamente', 'info');
+                mostrarNotificacion('El módulo de ' + titulos[tipo] + ' estará disponible próximamente', 'info');
                 $('#modalVistaPrevia').modal('hide');
                 return;
             }
@@ -1584,7 +1821,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 
                 const tiempoTotal = data.metadata ? data.metadata.tiempo_procesamiento : elapsed;
                 
-                // Remover alertas anteriores
                 $('.modal-body .alert.alert-success').remove();
                 
                 $('.modal-body').append(
@@ -1612,7 +1848,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             });
         }
 
-        // Función para generar tabla preview mejorada
         function generarTablaPreview(tipo, data) {
             const header = document.getElementById('preview-header');
             const body = document.getElementById('preview-body');
@@ -1636,7 +1871,11 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     'PALLETS': 'Pallets',
                     'STATUS': 'Estado',
                     'DATERECEIVED': 'Fecha Recepción',
-                    'EXTERNRECEIPTKEY': 'ASN Externo'
+                    'EXTERNRECEIPTKEY': 'ASN Externo',
+                    'TYPE': 'Tipo',
+                    'ORDERKEY': 'N° de Orden',
+                    'EXTERNORDERKEY': 'Orden Externa',
+                    'ADDDATE': 'Fecha Despacho'
                 };
                 
                 if (friendlyNames[col]) {
@@ -1659,7 +1898,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                         
                         const headerName = headers[cellIndex] || '';
                         
-                        // Alinear números a la derecha
                         if (['UNIDADES', 'CAJAS', 'PALLETS'].includes(headerName)) {
                             td.classList.add('text-right');
                             if (valor === '' || valor === null || valor === undefined) {
@@ -1728,6 +1966,12 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     </span>`;
                 }
                 
+                if (data.stats.orderkeys_unicos) {
+                    statsHtml += `<span class="badge badge-success">
+                        <i class="fa fa-tag"></i> Órdenes únicas: ${data.stats.orderkeys_unicos}
+                    </span>`;
+                }
+                
                 if (data.stats.total_unidades && data.stats.total_unidades !== '0') {
                     statsHtml += `<span class="badge badge-primary">
                         <i class="fa fa-cubes"></i> Unidades: ${data.stats.total_unidades}
@@ -1752,7 +1996,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             }
         }
 
-        // Función para actualizar estadísticas del módulo
         function actualizarEstadisticasModulo(tipo, stats) {
             if (tipo === 'recepcion') {
                 document.getElementById('recepcion-total').textContent = stats.total_filas || 0;
@@ -1761,7 +2004,6 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                     document.getElementById('recepcion-bultos').textContent = stats.receiptkeys_unicos;
                 }
                 
-                // Mostrar totales combinados
                 let totales = [];
                 if (stats.total_unidades && stats.total_unidades !== '0') totales.push(`${stats.total_unidades} Unid`);
                 if (stats.total_cajas && stats.total_cajas !== '0') totales.push(`${stats.total_cajas} Cjas`);
@@ -1775,12 +2017,22 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 } else {
                     document.getElementById('recepcion-fecha').textContent = 'No disponible';
                 }
+            } else if (tipo === 'despacho') {
+                document.getElementById('despacho-total').textContent = stats.total_filas || 0;
+                document.getElementById('despacho-peso').textContent = stats.total_unidades || '0';
+                
+                if (stats.fecha_min && stats.fecha_max) {
+                    document.getElementById('despacho-fecha-ini').textContent = stats.fecha_min;
+                    document.getElementById('despacho-fecha-fin').textContent = stats.fecha_max;
+                }
             }
             
-            document.getElementById(`data-${tipo}`).style.display = 'block';
+            const dataExtracted = document.getElementById(`data-${tipo}`);
+            if (dataExtracted) {
+                dataExtracted.style.display = 'block';
+            }
         }
 
-        // Función para confirmar procesamiento mejorada
         function confirmarProcesamiento() {
             archivosProcesados++;
             document.getElementById('archivosProcesados').textContent = archivosProcesados;
@@ -1822,29 +2074,139 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
                 mensaje += `📦 Pallets: ${stats.total_pallets}\n`;
             }
             
-            if (stats.filas_filtradas_cantidad > 0) {
-                mensaje += `\n⚠️ Se filtraron ${stats.filas_filtradas_cantidad} registros con cantidad cero.`;
-            }
-            if (stats.filas_filtradas_status > 0) {
-                mensaje += `\n⚠️ Se filtraron ${stats.filas_filtradas_status} registros por STATUS no válido.`;
-            }
-            if (stats.filas_filtradas_fecha > 0) {
-                mensaje += `\n📅 Se filtraron ${stats.filas_filtradas_fecha} registros por rango de fechas.`;
-            }
-            
             mostrarNotificacion('Archivo procesado correctamente', 'success');
+            
+            if (moduloActual === 'recepcion') {
+                guardarDatosRecepcion(datosProcesados['factura_id']);
+            } else if (moduloActual === 'despacho') {
+                guardarDatosDespacho(datosProcesados['factura_id']);
+            } else if (moduloActual === 'paquete') {
+                // Los otros servicios se guardan directamente desde el modal
+                mostrarNotificacion('Servicios guardados correctamente', 'success');
+            }
             
             filtrosActuales = { fecha_desde: '', fecha_hasta: '' };
         }
 
-        // Función para generar factura
         function generarFactura() {
             if (archivosProcesados === 0) {
                 mostrarNotificacion('Debe procesar al menos un módulo', 'warning');
                 return;
             }
-            
             mostrarNotificacion('Factura generada correctamente', 'success');
+        }
+        
+        function guardarDatosRecepcion(factura_id = null) {
+            guardarConProgreso('recepcion', factura_id);
+        }
+
+        function guardarDatosDespacho(factura_id = null) {
+            guardarConProgreso('despacho', factura_id);
+        }
+
+        function guardarConProgreso(modulo, factura_id) {
+            const data = datosProcesados[modulo];
+            if (!data || !data.data_completa) {
+                mostrarNotificacion('No hay datos completos para guardar', 'warning');
+                return;
+            }
+
+            if (factura_id) {
+                if (!confirm('⚠️ Ya existen datos. ¿Deseas reemplazarlos?')) {
+                    return;
+                }
+            }
+
+            const titulo = modulo === 'recepcion' ? 'Guardando Recepción' : 'Guardando Despacho';
+            const modal = mostrarModalProgreso(titulo, data.data_completa.length);
+
+            const datosAGuardar = {
+                factura_id: factura_id,
+                cliente_codigo: '<?php echo $codigo_cliente; ?>',
+                cliente_id: '<?php echo $cliente_info['id'] ?? 0; ?>',
+                archivo_nombre: document.getElementById(`nombre-${modulo}`)?.textContent || 'archivo.xlsx',
+                total_registros: data.total_registros,
+                datos: data.data_completa.map(row => {
+                    const obj = {};
+                    data.headers.forEach((header, index) => {
+                        obj[header] = row[index];
+                    });
+                    return obj;
+                })
+            };
+
+            iniciarPollingProgreso(modal);
+
+            fetch(`../../controller/arcor/guardar_${modulo}.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datosAGuardar)
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${text.substring(0, 200)}`);
+                }
+                return response.json();
+            })
+            .then(result => {
+                detenerPolling();
+                if (result.success) {
+                    modal.actualizar(100, '¡Completado!', data.data_completa.length);
+                    setTimeout(() => {
+                        modal.cerrar();
+                        mostrarNotificacion(`✅ ${result.mensaje}`, 'success');
+                    }, 1500);
+                    
+                    if (result.factura_id) {
+                        datosProcesados.factura_id = result.factura_id;
+                        localStorage.setItem('factura_actual', result.factura_id);
+                    }
+                } else {
+                    throw new Error(result.error);
+                }
+            })
+            .catch(error => {
+                detenerPolling();
+                modal.error(error.message);
+                setTimeout(() => modal.cerrar(), 3000);
+                mostrarNotificacion('Error: ' + error.message, 'error');
+            });
+        }
+
+        function iniciarPollingProgreso(modal) {
+            if (checkProgressInterval) {
+                clearInterval(checkProgressInterval);
+            }
+            
+            checkProgressInterval = setInterval(() => {
+                fetch('../../controller/check_progress.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.data) {
+                            modal.actualizar(
+                                data.data.porcentaje,
+                                data.data.mensaje,
+                                data.data.actual
+                            );
+                            
+                            if (data.data.estado === 'completado') {
+                                detenerPolling();
+                            } else if (data.data.estado === 'error') {
+                                modal.error(data.data.error);
+                                detenerPolling();
+                            }
+                        }
+                    })
+                    .catch(() => {});
+            }, 1000);
+        }
+
+        function detenerPolling() {
+            if (checkProgressInterval) {
+                clearInterval(checkProgressInterval);
+                checkProgressInterval = null;
+            }
         }
 
         // Toggle del menú
@@ -1852,5 +2214,11 @@ $titulo_pagina = "Nueva Factura - " . ($cliente_info['nombre_comercial'] ?? 'Cli
             document.querySelector('.left_col').classList.toggle('menu-open');
         });
     </script>
+
+    <!-- MODAL DE OTROS SERVICIOS -->
+    <?php include 'otros-servicios-modal.php'; ?>
+
+    <!-- SCRIPT DE OTROS SERVICIOS -->
+    <script src="otros-servicios.js"></script>
 </body>
 </html>
