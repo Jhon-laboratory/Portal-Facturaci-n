@@ -278,10 +278,59 @@ function getNombreModulo($modulo) {
             color: #333;
         }
 
-        .btn-pdf {
+        /* Estilos para iconos pequeños */
+        .acciones-iconos {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .btn-icono {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: 1px solid #e0e0e0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .btn-icono:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-pdf-icono {
+            color: #dc3545;
+        }
+
+        .btn-pdf-icono:hover {
             background: #dc3545;
             color: white;
-            border: none;
+            border-color: #dc3545;
+        }
+
+        .btn-actualizar-icono {
+            color: #28a745;
+        }
+
+        .btn-actualizar-icono:hover {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        /* Estilos para botón completar */
+        .btn-completar-modulo {
+            background: white;
+            color: #17a2b8;
+            border: 1px solid #17a2b8;
             padding: 6px 12px;
             border-radius: 20px;
             font-size: 12px;
@@ -290,62 +339,21 @@ function getNombreModulo($modulo) {
             gap: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
             margin: 2px;
+            font-weight: 500;
         }
 
-        .btn-pdf:hover {
-            background: #c82333;
+        .btn-completar-modulo:hover {
+            background: #17a2b8;
+            color: white;
             transform: translateY(-2px);
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
         }
 
-        .btn-pdf i {
+        .btn-completar-modulo i {
             font-size: 14px;
-        }
-
-        .btn-completar {
-            background: var(--info-color);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            margin: 2px;
-        }
-
-        .btn-completar:hover {
-            background: #138496;
-            transform: translateY(-2px);
-            color: white;
-            text-decoration: none;
-        }
-
-        .btn-actualizar {
-            background: #ffc107;
-            color: #333;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            margin: 2px;
-        }
-
-        .btn-actualizar:hover {
-            background: #e0a800;
-            transform: translateY(-2px);
-            color: #333;
-            text-decoration: none;
         }
 
         /* Stats cards */
@@ -475,13 +483,6 @@ function getNombreModulo($modulo) {
             border-bottom: 1px dashed #999;
         }
 
-        /* Acciones compactas */
-        .acciones-container {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .cliente-header-card {
@@ -589,12 +590,6 @@ function getNombreModulo($modulo) {
 
             <!-- CONTENIDO PRINCIPAL -->
             <div class="right_col" role="main">
-                <div class="page-title">
-                    <div class="title_left">
-                        <h3><i class="fa fa-file-text"></i> Gestión de Facturas</h3>
-                    </div>
-                </div>
-                
                 <div class="clearfix"></div>
 
                 <?php if (isset($error_db)): ?>
@@ -738,18 +733,17 @@ function getNombreModulo($modulo) {
                                             <span class="badge badge-success">
                                                 <i class="fa fa-check"></i> <?php echo $factura['total_recepcion']; ?>
                                             </span>
-                                            <div class="acciones-container">
-                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'recepcion')">
-                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                            <div class="acciones-iconos">
+                                                <button class="btn-icono btn-pdf-icono" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'recepcion')" title="Generar PDF">
+                                                    <i class="fa fa-file-pdf-o"></i>
                                                 </button>
-                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=recepcion" class="btn-actualizar">
-                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=recepcion" class="btn-icono btn-actualizar-icono" title="Actualizar">
+                                                    <i class="fa fa-refresh"></i>
                                                 </a>
                                             </div>
                                         <?php else: ?>
-                                            <span class="badge badge-secondary">Pendiente</span>
-                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=recepcion" class="btn-completar">
-                                                <i class="fa fa-plus"></i> Completar
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=recepcion" class="btn-completar-modulo">
+                                                <i class="fa fa-plus-circle"></i> Completar
                                             </a>
                                         <?php endif; ?>
                                     </td>
@@ -760,18 +754,17 @@ function getNombreModulo($modulo) {
                                             <span class="badge badge-success">
                                                 <i class="fa fa-check"></i> <?php echo $factura['total_despacho']; ?>
                                             </span>
-                                            <div class="acciones-container">
-                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'despacho')">
-                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                            <div class="acciones-iconos">
+                                                <button class="btn-icono btn-pdf-icono" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'despacho')" title="Generar PDF">
+                                                    <i class="fa fa-file-pdf-o"></i>
                                                 </button>
-                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=despacho" class="btn-actualizar">
-                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=despacho" class="btn-icono btn-actualizar-icono" title="Actualizar">
+                                                    <i class="fa fa-refresh"></i>
                                                 </a>
                                             </div>
                                         <?php else: ?>
-                                            <span class="badge badge-secondary">Pendiente</span>
-                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=despacho" class="btn-completar">
-                                                <i class="fa fa-plus"></i> Completar
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=despacho" class="btn-completar-modulo">
+                                                <i class="fa fa-plus-circle"></i> Completar
                                             </a>
                                         <?php endif; ?>
                                     </td>
@@ -782,18 +775,17 @@ function getNombreModulo($modulo) {
                                             <span class="badge badge-success">
                                                 <i class="fa fa-check"></i> <?php echo $factura['total_paquete']; ?>
                                             </span>
-                                            <div class="acciones-container">
-                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'paquete')">
-                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                            <div class="acciones-iconos">
+                                                <button class="btn-icono btn-pdf-icono" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'paquete')" title="Generar PDF">
+                                                    <i class="fa fa-file-pdf-o"></i>
                                                 </button>
-                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=paquete" class="btn-actualizar">
-                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=paquete" class="btn-icono btn-actualizar-icono" title="Actualizar">
+                                                    <i class="fa fa-refresh"></i>
                                                 </a>
                                             </div>
                                         <?php else: ?>
-                                            <span class="badge badge-secondary">Pendiente</span>
-                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=paquete" class="btn-completar">
-                                                <i class="fa fa-plus"></i> Completar
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=paquete" class="btn-completar-modulo">
+                                                <i class="fa fa-plus-circle"></i> Completar
                                             </a>
                                         <?php endif; ?>
                                     </td>
@@ -804,18 +796,17 @@ function getNombreModulo($modulo) {
                                             <span class="badge badge-success">
                                                 <i class="fa fa-check"></i> <?php echo $factura['total_almacen']; ?>
                                             </span>
-                                            <div class="acciones-container">
-                                                <button class="btn-pdf" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'almacen')">
-                                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                            <div class="acciones-iconos">
+                                                <button class="btn-icono btn-pdf-icono" onclick="generarPDF(<?php echo $factura['factura_id']; ?>, 'almacen')" title="Generar PDF">
+                                                    <i class="fa fa-file-pdf-o"></i>
                                                 </button>
-                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=almacen" class="btn-actualizar">
-                                                    <i class="fa fa-refresh"></i> Actualizar
+                                                <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=almacen" class="btn-icono btn-actualizar-icono" title="Actualizar">
+                                                    <i class="fa fa-refresh"></i>
                                                 </a>
                                             </div>
                                         <?php else: ?>
-                                            <span class="badge badge-secondary">Pendiente</span>
-                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=almacen" class="btn-completar">
-                                                <i class="fa fa-plus"></i> Completar
+                                            <a href="nueva_factura.php?cliente=<?php echo urlencode($codigo_cliente); ?>&factura_id=<?php echo $factura['factura_id']; ?>&modulo=almacen" class="btn-completar-modulo">
+                                                <i class="fa fa-plus-circle"></i> Completar
                                             </a>
                                         <?php endif; ?>
                                     </td>
