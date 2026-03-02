@@ -10,11 +10,27 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Obtener el rol del usuario
+$user_rol = $_SESSION['user_rol'] ?? 3; // 1=Admin, 2=Supervisor, 3=Verificador
+$user_id = $_SESSION['user_id'];
+
 // Obtener el cliente de la URL
 $codigo_cliente = isset($_GET['cliente']) ? $_GET['cliente'] : '';
 
 if (empty($codigo_cliente)) {
     header("Location: ../../dashboard.php");
+    exit;
+}
+
+// Verificar si el usuario tiene permiso para este cliente
+$tiene_permiso = false;
+if (isset($_SESSION['permisos_clientes'][$codigo_cliente])) {
+    $tiene_permiso = true;
+    $permiso_cliente = $_SESSION['permisos_clientes'][$codigo_cliente];
+    $tipo_acceso = $permiso_cliente['tipo_usuario'];
+} else {
+    // Si no tiene permiso, redirigir
+    header("Location: ../../dashboard.php?msg=" . urlencode("No tiene acceso a este cliente"));
     exit;
 }
 
@@ -32,7 +48,7 @@ try {
     $conn = getDBConnection();
     
     // Obtener datos del cliente
-    $query_cliente = "SELECT id, codigo_cliente, nombre_comercial, logo_png, direccion, telefono, email, nit 
+    $query_cliente = "SELECT id, codigo_cliente, nombre_comercial, razon_social, nit, telefono, email, direccion, logo_png, contador_facturas 
                       FROM [FacBol].[clientes] 
                       WHERE codigo_cliente = :codigo";
     $stmt = $conn->prepare($query_cliente);
@@ -56,6 +72,7 @@ try {
                         ISNULL(fc.paquete_completado, 0) as paquete_completado,
                         ISNULL(fc.almacen_completado, 0) as almacen_completado,
                         fc.estado,
+                        fc.observaciones,
                         fc.recepcion_archivo,
                         fc.despacho_archivo,
                         fc.paquete_archivo,
@@ -77,6 +94,22 @@ try {
     $stats['facturas_mes'] = count(array_filter($facturas, function($f) {
         return date('Y-m', strtotime($f['fecha_emision'])) == date('Y-m');
     }));
+    
+    // Obtener observaciones de facturas
+    $query_observaciones = "SELECT fo.*, u.nombre as usuario_nombre 
+                           FROM [FacBol].[facturas_observaciones] fo
+                           INNER JOIN [IT].[usuarios_pt] u ON fo.usuario_id = u.id
+                           WHERE fo.factura_id IN (SELECT id FROM " . TABLA_FACTURAS . " WHERE cliente_codigo = :codigo)
+                           ORDER BY fo.fecha_registro DESC";
+    $stmt = $conn->prepare($query_observaciones);
+    $stmt->execute([':codigo' => $codigo_cliente]);
+    $observaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Indexar observaciones por factura_id
+    $observaciones_por_factura = [];
+    foreach ($observaciones as $obs) {
+        $observaciones_por_factura[$obs['factura_id']][] = $obs;
+    }
     
 } catch (Exception $e) {
     $error_db = "Error de conexión: " . $e->getMessage();
@@ -134,6 +167,7 @@ function getNombreModulo($modulo) {
     <!-- CSS -->
     <link href="../../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="../../vendors/nprogress/nprogress.css" rel="stylesheet">
     <link href="../../vendors/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet">
     <link href="../../vendors/animate.css/animate.min.css" rel="stylesheet">
@@ -438,7 +472,7 @@ function getNombreModulo($modulo) {
             background: #f5f5f5;
         }
 
-        /* Badges */
+        /* Badges originales */
         .badge-estado {
             padding: 6px 12px;
             border-radius: 30px;
@@ -460,27 +494,139 @@ function getNombreModulo($modulo) {
             border: 1px solid #ffeeba;
         }
 
-        .badge-incompleto {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
         .badge-warning {
             background: #fff3cd;
             color: #856404;
             border: 1px solid #ffeeba;
         }
 
-        .badge-recepcion { background: #cce5ff; color: #004085; }
-        .badge-despacho { background: #d4edda; color: #155724; }
-        .badge-otrosservicios { background: #fff3cd; color: #856404; }
-        .badge-ocupabilidad { background: #e8f5e9; color: #1e7e34; }
+        /* NUEVOS ESTILOS PARA BOTONES DE ESTADO */
+        .btn-estado {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
 
-        /* Tooltip */
+        .btn-estado:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-estado-registrado {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+        }
+
+        .btn-estado-verificado {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .btn-estado-aprobado {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .btn-estado-observado {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+
+        .btn-estado-facturado {
+            background: #e0d4f7;
+            color: #563d7c;
+            border: 1px solid #d3c5f0;
+        }
+
+        .btn-estado-pagado {
+            background: #d6d8d9;
+            color: #1e7e34;
+            border: 1px solid #c6c8ca;
+            font-weight: 700;
+        }
+
+        /* Acciones de resumen */
+        .acciones-resumen {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .btn-resumen {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-resumen-editar {
+            background: #009a3f;
+            color: white;
+        }
+
+        .btn-resumen-editar:hover {
+            background: #007a32;
+            transform: translateY(-2px);
+        }
+
+        .btn-resumen-pdf {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-resumen-pdf:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
         .tooltip-modulos {
             cursor: help;
             border-bottom: 1px dashed #999;
+        }
+
+        /* Estilos para observaciones */
+        .badge-obs {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .badge-obs-aprobador {
+            background: #ffc107;
+            color: #856404;
+        }
+        
+        .badge-obs-aprobador:hover {
+            background: #e0a800;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .badge-obs-cliente {
+            background: #17a2b8;
+            color: white;
         }
 
         /* Responsive */
@@ -509,10 +655,8 @@ function getNombreModulo($modulo) {
                 grid-template-columns: 1fr 1fr;
             }
             
-            .acciones-container {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
+            .acciones-resumen {
+                flex-direction: column;
             }
         }
 
@@ -542,6 +686,7 @@ function getNombreModulo($modulo) {
                         <div class="profile_info">
                             <span>Bienvenido,</span>
                             <h2><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Usuario'); ?></h2>
+                            <small><i class="fa fa-tag"></i> <?php echo $_SESSION['user_rol_nombre'] ?? ''; ?></small>
                         </div>
                     </div>
 
@@ -555,14 +700,22 @@ function getNombreModulo($modulo) {
                                     <a href="../../dashboard.php"><i class="fa fa-dashboard"></i> Dashboard</a>
                                 </li>
                                 <li>
-                                    <a href="../../ingreso.php"><i class="fa fa-sign-in"></i> Ingreso</a>
+                                    <a href="index.php?cliente=<?php echo urlencode($codigo_cliente); ?>">
+                                        <i class="fa fa-arrow-left"></i> Volver al Cliente
+                                    </a>
+                                </li>
+                                <?php if ($user_rol <= 2): // Admin o Supervisor ?>
+                                <li>
+                                    <a href="#" onclick="abrirModalTarifas()">
+                                        <i class="fa fa-usd"></i> Modificar Tarifas
+                                    </a>
                                 </li>
                                 <li>
-                                    <a href="../../translado.php"><i class="fa fa-exchange"></i> Traslado</a>
+                                    <a href="#" onclick="abrirModalCliente()">
+                                        <i class="fa fa-building"></i> Editar Cliente
+                                    </a>
                                 </li>
-                                <li>
-                                    <a href="../../reportes.php"><i class="fa fa-file-text"></i> Reportes</a>
-                                </li>
+                                <?php endif; ?>
                             </ul>
                         </div>
                     </div>
@@ -580,8 +733,8 @@ function getNombreModulo($modulo) {
                             <i class="fa fa-user-circle"></i> 
                             <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Usuario'); ?>
                             <small style="margin-left: 10px;">
-                                <i class="fa fa-map-marker"></i> 
-                                <?php echo htmlspecialchars($_SESSION['user_ciudad'] ?? 'N/A'); ?>
+                                <i class="fa fa-tag"></i> 
+                                <?php echo $_SESSION['user_rol_nombre'] ?? ''; ?>
                             </small>
                         </span>
                     </div>
@@ -688,7 +841,7 @@ function getNombreModulo($modulo) {
                                 <th>Despacho</th>
                                 <th>Otros Servicios</th>
                                 <th>Ocupabilidad</th>
-                                <th>Acciones</th>
+                                <th>Resumen</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -702,6 +855,32 @@ function getNombreModulo($modulo) {
                             <?php else: ?>
                                 <?php foreach ($facturas as $factura): 
                                     list($estado_texto, $estado_clase) = getEstadoFactura($factura);
+                                    $estado = $factura['estado'] ?? 'REGISTRADO';
+                                    
+                                    // Determinar clase de color para el botón de estado
+                                    $color_class = '';
+                                    switch($estado) {
+                                        case 'REGISTRADO':
+                                            $color_class = 'btn-estado-registrado';
+                                            break;
+                                        case 'VERIFICADO':
+                                            $color_class = 'btn-estado-verificado';
+                                            break;
+                                        case 'APROBADO':
+                                            $color_class = 'btn-estado-aprobado';
+                                            break;
+                                        case 'OBSERVADO':
+                                            $color_class = 'btn-estado-observado';
+                                            break;
+                                        case 'FACTURADO':
+                                            $color_class = 'btn-estado-facturado';
+                                            break;
+                                        case 'PAGADO':
+                                            $color_class = 'btn-estado-pagado';
+                                            break;
+                                        default:
+                                            $color_class = 'btn-estado-registrado';
+                                    }
                                 ?>
                                 <tr>
                                     <td>
@@ -710,10 +889,35 @@ function getNombreModulo($modulo) {
                                     <td>
                                         <?php echo date('d/m/Y', strtotime($factura['fecha_emision'])); ?>
                                     </td>
+                                    
+                                    <!-- COLUMNA ESTADO CON BOTÓN Y COLORES -->
                                     <td>
-                                        <span class="badge-estado <?php echo $estado_clase; ?>">
-                                            <?php echo $estado_texto; ?>
-                                        </span>
+                                        <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+                                            <?php if ($user_rol <= 2): // Admin o Supervisor pueden cambiar estado ?>
+                                                <button class="btn-estado <?php echo $color_class; ?>" 
+                                                        onclick="cambiarEstadoModal(<?php echo $factura['factura_id']; ?>, '<?php echo $estado; ?>')"
+                                                        title="Click para cambiar estado"
+                                                        style="flex: 1;">
+                                                    <?php echo $estado; ?>
+                                                </button>
+                                            <?php else: // Verificador solo ve el estado ?>
+                                                <span class="btn-estado <?php echo $color_class; ?>" style="cursor:default; flex: 1;">
+                                                    <?php echo $estado; ?>
+                                                </span>
+                                            <?php endif; ?>
+                                            
+                                            <!-- MOSTRAR OBSERVACIONES CUANDO EL ESTADO ES OBSERVADO -->
+                                            <?php if ($estado == 'OBSERVADO' && isset($observaciones_por_factura[$factura['factura_id']])): ?>
+                                                <?php foreach ($observaciones_por_factura[$factura['factura_id']] as $obs): ?>
+                                                    <span class="badge-obs badge-obs-aprobador" 
+                                                          style="display:inline-flex; align-items:center; gap:3px; white-space:nowrap;"
+                                                          onclick="verObservacion('<?php echo htmlspecialchars(addslashes($obs['observacion'])); ?>', '<?php echo htmlspecialchars($obs['usuario_nombre']); ?>', '<?php echo $obs['fecha_registro']; ?>')"
+                                                          title="Click para ver detalle">
+                                                        <i class="fa fa-eye"></i> Ver
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </div>
                                         <br>
                                         <small class="text-muted tooltip-modulos" title="<?php echo getModulosCompletados($factura); ?>">
                                             <?php 
@@ -725,6 +929,9 @@ function getNombreModulo($modulo) {
                                             echo $completados . '/4 completados';
                                             ?>
                                         </small>
+                                        <?php if ($estado == 'APROBADO' && !empty($factura['almacen_archivo'])): ?>
+                                            <br><small class="text-success"><i class="fa fa-check-circle"></i> <?php echo htmlspecialchars($factura['almacen_archivo']); ?></small>
+                                        <?php endif; ?>
                                     </td>
                                     
                                     <!-- RECEPCIÓN -->
@@ -811,11 +1018,16 @@ function getNombreModulo($modulo) {
                                         <?php endif; ?>
                                     </td>
                                     
-                                    <!-- ACCIONES GENERALES -->
+                                    <!-- ACCIONES DE RESUMEN (2 BOTONES) -->
                                     <td>
-                                        <button class="btn btn-sm btn-info" onclick="verResumen(<?php echo $factura['factura_id']; ?>)">
-                                            <i class="fa fa-eye"></i> Resumen
-                                        </button>
+                                        <div class="acciones-resumen">
+                                            <button class="btn-resumen btn-resumen-editar" onclick="abrirResumen(<?php echo $factura['factura_id']; ?>)">
+                                                <i class="fa fa-pencil"></i> Editar
+                                            </button>
+                                            <button class="btn-resumen btn-resumen-pdf" onclick="generarPDFResumen(<?php echo $factura['factura_id']; ?>)">
+                                                <i class="fa fa-file-pdf-o"></i> PDF
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -835,29 +1047,114 @@ function getNombreModulo($modulo) {
         </div>
     </div>
 
-    <!-- MODAL DE RESUMEN -->
-    <div class="modal fade" id="modalResumen" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
+    <!-- MODAL DE TARIFAS -->
+    <div class="modal fade" id="modalTarifas" tabindex="-1" role="dialog" aria-labelledby="modalTarifasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" style="max-width: 1200px;" role="document">
             <div class="modal-content">
-                <div class="modal-header" style="background: var(--primary-color); color: white;">
-                    <h4 class="modal-title">
-                        <i class="fa fa-file-text"></i> Resumen de Factura
-                    </h4>
-                    <button type="button" class="close" data-dismiss="modal" style="color: white;">
-                        <span>&times;</span>
-                    </button>
+                <div class="modal-header" style="background: #009a3f; color: white;">
+                    <h5 class="modal-title">
+                        <i class="fa fa-usd"></i> Modificar Tarifas - <?php echo htmlspecialchars($cliente_info['nombre_comercial']); ?>
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">&times;</button>
                 </div>
-                <div class="modal-body" id="resumenContent">
-                    <p class="text-center">
-                        <i class="fa fa-spinner fa-spin fa-3x"></i><br>
-                        Cargando resumen...
-                    </p>
+                <div class="modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                    <div id="tarifas-content">
+                        <p class="text-center">
+                            <i class="fa fa-spinner fa-spin fa-3x text-success"></i>
+                            <br>Cargando tarifas...
+                        </p>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fa fa-times"></i> Cerrar
-                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" onclick="guardarTarifas()">Guardar Cambios</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR CLIENTE -->
+    <div class="modal fade" id="modalCliente" tabindex="-1" role="dialog" aria-labelledby="modalClienteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #009a3f; color: white;">
+                    <h5 class="modal-title">
+                        <i class="fa fa-building"></i> Editar Cliente
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" style="color: white;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 20px;">
+                    <form id="formCliente">
+                        <input type="hidden" id="cliente_id" value="<?php echo $cliente_info['id']; ?>">
+                        <input type="hidden" id="cliente_codigo" value="<?php echo $cliente_info['codigo_cliente']; ?>">
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Nombre Comercial <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="nombre_comercial" value="<?php echo htmlspecialchars($cliente_info['nombre_comercial']); ?>" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Razón Social</label>
+                                    <input type="text" class="form-control" id="razon_social" value="<?php echo htmlspecialchars($cliente_info['razon_social'] ?? ''); ?>">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>NIT</label>
+                                    <input type="text" class="form-control" id="nit" value="<?php echo htmlspecialchars($cliente_info['nit'] ?? ''); ?>">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Teléfono</label>
+                                    <input type="text" class="form-control" id="telefono" value="<?php echo htmlspecialchars($cliente_info['telefono'] ?? ''); ?>">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" id="email" value="<?php echo htmlspecialchars($cliente_info['email'] ?? ''); ?>">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Dirección</label>
+                            <textarea class="form-control" id="direccion" rows="2"><?php echo htmlspecialchars($cliente_info['direccion'] ?? ''); ?></textarea>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> El logo se gestiona por separado. Contacte al administrador para cambiarlo.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="guardarCliente()">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE RESUMEN -->
+    <div class="modal fade" id="modalResumen" tabindex="-1" role="dialog" aria-labelledby="modalResumenLabel" aria-hidden="true">
+        <div class="modal-dialog" style="max-width: 1400px; width: 95%;" role="document">
+            <div class="modal-content" id="modalResumenContent">
+                <!-- El contenido se carga aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CAMBIO DE ESTADO -->
+    <div class="modal fade" id="modalCambioEstado" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="max-width: 500px;">
+            <div class="modal-content">
+                <!-- El contenido se carga dinámicamente -->
             </div>
         </div>
     </div>
@@ -870,6 +1167,11 @@ function getNombreModulo($modulo) {
     <script src="../../build/js/custom.min.js"></script>
 
     <script>
+        // Variables globales
+        var userRol = <?php echo $user_rol; ?>;
+        var codigoCliente = '<?php echo $codigo_cliente; ?>';
+        var clienteId = <?php echo $cliente_info['id']; ?>;
+
         // Inicializar DataTable
         $(document).ready(function() {
             $('#tablaFacturas').DataTable({
@@ -882,7 +1184,109 @@ function getNombreModulo($modulo) {
             });
         });
 
-        // Función para generar PDF
+        // Función para abrir modal de tarifas
+        function abrirModalTarifas() {
+            $('#modalTarifas').modal('show');
+            $('#tarifas-content').html(`
+                <p class="text-center">
+                    <i class="fa fa-spinner fa-spin fa-3x text-success"></i>
+                    <br>Cargando tarifas...
+                </p>
+            `);
+            
+            $.ajax({
+                url: 'get_tarifas.php',
+                method: 'GET',
+                data: { cliente: codigoCliente },
+                dataType: 'html',
+                success: function(response) {
+                    $('#tarifas-content').html(response);
+                },
+                error: function(xhr, status, error) {
+                    $('#tarifas-content').html(`
+                        <div class="alert alert-danger">
+                            <i class="fa fa-exclamation-triangle"></i> Error al cargar tarifas: ${error}
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        // Función para guardar tarifas
+        function guardarTarifas() {
+            var tarifas = [];
+            $('.tarifa-row').each(function() {
+                var id = $(this).data('id');
+                var tarifa_usd = $(this).find('.tarifa-usd').val();
+                if (id && tarifa_usd) {
+                    tarifas.push({
+                        id: id,
+                        tarifa_usd: tarifa_usd
+                    });
+                }
+            });
+            
+            $.ajax({
+                url: 'guardar_tarifas.php',
+                method: 'POST',
+                data: JSON.stringify({
+                    cliente: codigoCliente,
+                    tarifas: tarifas
+                }),
+                contentType: 'application/json',
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ Tarifas guardadas correctamente');
+                        $('#modalTarifas').modal('hide');
+                    } else {
+                        alert('❌ Error: ' + response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('❌ Error al guardar tarifas: ' + error);
+                }
+            });
+        }
+
+        // Función para abrir modal de editar cliente
+        function abrirModalCliente() {
+            $('#modalCliente').modal('show');
+        }
+
+        // Función para guardar cliente
+        function guardarCliente() {
+            var data = {
+                id: $('#cliente_id').val(),
+                codigo_cliente: $('#cliente_codigo').val(),
+                nombre_comercial: $('#nombre_comercial').val(),
+                razon_social: $('#razon_social').val(),
+                nit: $('#nit').val(),
+                telefono: $('#telefono').val(),
+                email: $('#email').val(),
+                direccion: $('#direccion').val()
+            };
+            
+            $.ajax({
+                url: 'guardar_cliente.php',
+                method: 'POST',
+                data: JSON.stringify(data),
+                contentType: 'application/json',
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ Cliente actualizado correctamente');
+                        $('#modalCliente').modal('hide');
+                        location.reload();
+                    } else {
+                        alert('❌ Error: ' + response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('❌ Error al guardar cliente: ' + error);
+                }
+            });
+        }
+
+        // Función para generar PDF de módulos específicos
         function generarPDF(factura_id, modulo) {
             let moduloNombre = '';
             switch(modulo) {
@@ -894,19 +1298,192 @@ function getNombreModulo($modulo) {
             window.open('generar_pdf.php?factura_id=' + factura_id + '&modulo=' + modulo, '_blank');
         }
 
-        // Función para ver resumen
-        function verResumen(factura_id) {
-            $('#modalResumen').modal('show');
+        // Función para generar PDF del resumen completo
+        function generarPDFResumen(factura_id) {
+            window.open('generar_pdf_resumen.php?factura_id=' + factura_id, '_blank');
+        }
+
+        // Función para ver observación
+        function verObservacion(observacion, usuario, fecha) {
+            // Formatear fecha
+            if (fecha) {
+                var date = new Date(fecha);
+                fecha = date.toLocaleString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+            
+            // Crear modal temporal
+            var modalHtml = `
+                <div class="modal fade" id="modalVerObservacion" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background: #ffc107; color: #856404;">
+                                <h5 class="modal-title">
+                                    <i class="fa fa-eye"></i> Detalle de Observación
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Observación:</strong></p>
+                                <div class="alert alert-warning" style="white-space: pre-wrap;">
+                                    ${observacion}
+                                </div>
+                                <hr>
+                                <p><strong>Registrado por:</strong> ${usuario}</p>
+                                <p><strong>Fecha:</strong> ${fecha}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Eliminar modal anterior si existe
+            $('#modalVerObservacion').remove();
+            
+            // Agregar y mostrar el nuevo modal
+            $('body').append(modalHtml);
+            $('#modalVerObservacion').modal('show');
+            
+            // Eliminar del DOM cuando se cierre
+            $('#modalVerObservacion').on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+        }
+
+        // Función para abrir modal de cambio de estado
+        function cambiarEstadoModal(factura_id, estado_actual) {
+            var opciones = '';
+            if (userRol == 1) { // Admin puede todos
+                opciones = `
+                    <option value="REGISTRADO">REGISTRADO</option>
+                    <option value="VERIFICADO">VERIFICADO</option>
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                    <option value="FACTURADO">FACTURADO</option>
+                    <option value="PAGADO">PAGADO</option>
+                `;
+            } else if (userRol == 2) { // Supervisor solo puede poner Aprobado u Observado
+                opciones = `
+                    <option value="APROBADO">APROBADO</option>
+                    <option value="OBSERVADO">OBSERVADO</option>
+                `;
+            } else {
+                return; // Verificador no puede cambiar estado
+            }
+            
+            $('#modalCambioEstado .modal-content').html(`
+                <div class="modal-header" style="background:#009a3f; color:white;">
+                    <h5 class="modal-title">Cambiar Estado de Factura</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body p-4">
+                    <p><strong>Factura:</strong> FAC-${String(factura_id).padStart(6, '0')}</p>
+                    <p><strong>Estado actual:</strong> <span class="badge badge-info">${estado_actual}</span></p>
+                    
+                    <div class="form-group mt-3">
+                        <label>Nuevo estado:</label>
+                        <select class="form-control" id="nuevoEstado">
+                            ${opciones}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group mt-3" id="observacionGroup" style="display:none;">
+                        <label>Observaciones:</label>
+                        <textarea class="form-control" id="observacion" rows="3" placeholder="Ingrese las observaciones..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-success" onclick="cambiarEstado(${factura_id})">Cambiar Estado</button>
+                </div>
+            `);
+            
+            // Mostrar campo de observación solo si selecciona OBSERVADO
+            $('#nuevoEstado').change(function() {
+                if ($(this).val() === 'OBSERVADO') {
+                    $('#observacionGroup').show();
+                } else {
+                    $('#observacionGroup').hide();
+                }
+            });
+            
+            $('#modalCambioEstado').modal('show');
+        }
+
+        // Función para cambiar estado (ajax)
+        function cambiarEstado(factura_id) {
+            const nuevoEstado = $('#nuevoEstado').val();
+            const observacion = $('#observacion').val() || '';
             
             $.ajax({
-                url: 'resumen_factura.php',
+                url: 'cambiar_estado.php',
+                method: 'POST',
+                data: JSON.stringify({
+                    factura_id: factura_id,
+                    estado: nuevoEstado,
+                    observacion: observacion,
+                    tipo_observacion: 'APROBADOR'
+                }),
+                contentType: 'application/json',
+                success: function(response) {
+                    if (response.success) {
+                        alert('✅ ' + response.mensaje);
+                        $('#modalCambioEstado').modal('hide');
+                        location.reload(); // Recargar para ver el cambio
+                    } else {
+                        alert('❌ Error: ' + response.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('❌ Error al cambiar estado: ' + error);
+                }
+            });
+        }
+
+        // Función para abrir el resumen
+        function abrirResumen(factura_id) {
+            $('#modalResumen .modal-content').html(`
+                <div class="modal-header" style="background:#009a3f; color:white;">
+                    <h5 class="modal-title">Cargando...</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body text-center p-5">
+                    <i class="fa fa-spinner fa-spin fa-3x text-success"></i>
+                    <p class="mt-3">Cargando datos de la factura...</p>
+                </div>
+            `);
+            $('#modalResumen').modal('show');
+
+            $.ajax({
+                url: 'get_resumen_data.php',
                 method: 'GET',
                 data: { factura_id: factura_id },
+                dataType: 'html',
                 success: function(response) {
-                    $('#resumenContent').html(response);
+                    $('#modalResumen .modal-content').html(response);
                 },
-                error: function() {
-                    $('#resumenContent').html('<p class="text-center text-danger">Error al cargar el resumen</p>');
+                error: function(xhr, status, error) {
+                    $('#modalResumen .modal-content').html(`
+                        <div class="modal-header" style="background:#dc3545; color:white;">
+                            <h5 class="modal-title">Error</h5>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body text-center p-4">
+                            <i class="fa fa-exclamation-triangle fa-3x text-danger"></i>
+                            <p class="mt-3">Error al cargar: ${error}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    `);
                 }
             });
         }
@@ -916,5 +1493,6 @@ function getNombreModulo($modulo) {
             document.querySelector('.left_col').classList.toggle('menu-open');
         });
     </script>
+
 </body>
 </html>

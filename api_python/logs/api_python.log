@@ -4653,3 +4653,75 @@ TypeError: Object of type int64 is not JSON serializable
 2026-02-26 16:01:10,887 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 16:01:10] "GET /health HTTP/1.1" 200 -
 2026-02-26 16:16:23,335 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 16:16:23] "GET /health HTTP/1.1" 200 -
 2026-02-26 16:16:28,384 - werkzeug - INFO - 127.0.0.1 - - [26/Feb/2026 16:16:28] "GET /health HTTP/1.1" 200 -
+2026-02-27 10:54:53,053 - __main__ - INFO - Procesadores importados correctamente
+2026-02-27 10:54:53,057 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-27 10:54:53,158 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-27 10:54:53,158 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-27 10:54:53,160 - werkzeug - INFO -  * Restarting with stat
+2026-02-27 10:54:54,337 - __main__ - INFO - Procesadores importados correctamente
+2026-02-27 10:54:54,339 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-27 10:54:54,373 - werkzeug - WARNING -  * Debugger is active!
+2026-02-27 10:54:54,386 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-27 10:54:56,113 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 10:54:56] "GET /health HTTP/1.1" 200 -
+2026-02-27 10:55:04,917 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 10:55:04] "GET /health HTTP/1.1" 200 -
+2026-02-27 10:55:04,930 - __main__ - INFO - [20260227_105504_930450] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-27 10:55:05,027 - __main__ - INFO - [20260227_105504_930450] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260227_105504_930450_Export (53).xlsx (1814749 bytes)
+2026-02-27 10:55:05,028 - __main__ - INFO - [20260227_105504_930450] Filtros: desde=, hasta=
+2026-02-27 10:55:05,028 - procesadores.recepcion_procesador - INFO - [20260227_105504_930450] Procesando recepción
+2026-02-27 10:55:16,616 - procesadores.recepcion_procesador - INFO - [20260227_105504_930450] Hoja: Detail, Filas: 2900
+2026-02-27 10:55:16,637 - procesadores.recepcion_procesador - INFO - [20260227_105504_930450] Después de limpiar: 2899 filas
+2026-02-27 10:55:16,645 - procesadores.recepcion_procesador - INFO - [20260227_105504_930450] Después de filtrar STATUS: 0 filas
+2026-02-27 10:55:16,659 - __main__ - INFO - [20260227_105504_930450] Procesamiento completado en 11.73 segundos
+2026-02-27 10:55:17,261 - __main__ - INFO - [20260227_105504_930450] Archivo temporal eliminado
+2026-02-27 10:55:17,267 - __main__ - INFO - [20260227_105504_930450] Enviando respuesta JSON exitosamente
+2026-02-27 10:55:17,518 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 10:55:17] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-27 10:55:25,120 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 10:55:25] "GET /health HTTP/1.1" 200 -
+2026-02-27 10:55:25,132 - __main__ - INFO - [20260227_105525_132762] ===== INICIO PROCESAMIENTO RECEPCION =====
+2026-02-27 10:55:25,328 - __main__ - INFO - [20260227_105525_132762] Archivo guardado: C:\Users\JOHNAR~1\AppData\Local\Temp\20260227_105525_132762_Export (51).xlsx (3378917 bytes)
+2026-02-27 10:55:25,329 - __main__ - INFO - [20260227_105525_132762] Filtros: desde=, hasta=
+2026-02-27 10:55:25,329 - procesadores.recepcion_procesador - INFO - [20260227_105525_132762] Procesando recepción
+2026-02-27 10:55:47,670 - procesadores.recepcion_procesador - INFO - [20260227_105525_132762] Hoja: Detail, Filas: 6419
+2026-02-27 10:55:47,680 - procesadores.recepcion_procesador - INFO - [20260227_105525_132762] Después de limpiar: 6418 filas
+2026-02-27 10:55:47,690 - procesadores.recepcion_procesador - INFO - [20260227_105525_132762] Después de filtrar STATUS: 2305 filas
+2026-02-27 10:55:48,363 - procesadores.recepcion_procesador - INFO - [20260227_105525_132762] Después de agrupar: 357 filas
+2026-02-27 10:55:48,428 - __main__ - INFO - [20260227_105525_132762] Procesamiento completado en 23.30 segundos
+2026-02-27 10:55:48,963 - __main__ - INFO - [20260227_105525_132762] Archivo temporal eliminado
+2026-02-27 10:55:48,964 - __main__ - INFO - [20260227_105525_132762] Enviando respuesta JSON exitosamente
+2026-02-27 10:55:49,101 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 10:55:49] "POST /procesar/recepcion HTTP/1.1" 200 -
+2026-02-27 16:17:32,901 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:17:32] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:22:11,739 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:22:11] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:22:31,391 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:22:31] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:25:01,219 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:25:01] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:27:27,324 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:27:27] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:28:25,349 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:28:25] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:31:48,470 - __main__ - INFO - Procesadores importados correctamente
+2026-02-27 16:31:48,473 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-27 16:31:48,585 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-27 16:31:48,586 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-27 16:31:48,590 - werkzeug - INFO -  * Restarting with stat
+2026-02-27 16:31:50,618 - __main__ - INFO - Procesadores importados correctamente
+2026-02-27 16:31:50,621 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-27 16:31:50,664 - werkzeug - WARNING -  * Debugger is active!
+2026-02-27 16:31:50,677 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-27 16:31:53,862 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:31:53] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:36:28,986 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:36:28] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:42:04,008 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:42:04] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:42:39,253 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:42:39] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:45:05,483 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:45:05] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:48:57,727 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:48:57] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:58:24,688 - __main__ - INFO - Procesadores importados correctamente
+2026-02-27 16:58:24,692 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-27 16:58:24,793 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-02-27 16:58:24,794 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2026-02-27 16:58:24,800 - werkzeug - INFO -  * Restarting with stat
+2026-02-27 16:58:26,891 - __main__ - INFO - Procesadores importados correctamente
+2026-02-27 16:58:26,895 - __main__ - INFO - Iniciando API Python en http://127.0.0.1:5000
+2026-02-27 16:58:26,943 - werkzeug - WARNING -  * Debugger is active!
+2026-02-27 16:58:26,955 - werkzeug - INFO -  * Debugger PIN: 143-932-689
+2026-02-27 16:58:27,482 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:58:27] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:58:45,805 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:58:45] "GET /health HTTP/1.1" 200 -
+2026-02-27 16:59:04,363 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 16:59:04] "GET /health HTTP/1.1" 200 -
+2026-02-27 17:03:56,963 - werkzeug - INFO - 127.0.0.1 - - [27/Feb/2026 17:03:56] "GET /health HTTP/1.1" 200 -

@@ -41,13 +41,11 @@ try {
         exit;
     }
     
-
-    
     // Si hay factura_id, obtener información de la factura
     if ($factura_id > 0) {
         $query_factura = "SELECT id, recepcion_completado, despacho_completado, 
                                  paquete_completado, almacen_completado
-                          FROM " . TABLA_FACTURAS . "
+                          FROM DPL.FacBol.facturas_cabecera
                           WHERE id = :id AND cliente_codigo = :cliente";
         $stmt = $conn->prepare($query_factura);
         $stmt->execute([':id' => $factura_id, ':cliente' => $codigo_cliente]);
@@ -72,17 +70,18 @@ try {
 }
 
 // Determinar el título según la acción
-$accion = 'Actualizar'; // Siempre será Actualizar porque ya tenemos factura_id
 $modulo_nombre = '';
 switch($modulo_activo) {
     case 'recepcion': $modulo_nombre = 'Recepción'; break;
     case 'despacho': $modulo_nombre = 'Despacho'; break;
     case 'paquete': $modulo_nombre = 'Otros Servicios'; break;
     case 'almacen': $modulo_nombre = 'Ocupabilidad'; break;
-    default: $modulo_nombre = 'Completa';
+    default: $modulo_nombre = '';
 }
 
-$titulo_pagina = "Factura FAC-" . str_pad($factura_id, 6, '0', STR_PAD_LEFT) . " - $modulo_nombre - " . ($cliente_info['nombre_comercial'] ?? 'Cliente');
+$titulo_pagina = "Factura FAC-" . str_pad($factura_id, 6, '0', STR_PAD_LEFT) . 
+                 (!empty($modulo_nombre) ? " - $modulo_nombre" : "") . 
+                 " - " . ($cliente_info['nombre_comercial'] ?? 'Cliente');
 
 // Función para determinar si un módulo debe mostrarse
 function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
@@ -784,6 +783,30 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             font-size: 12px;
         }
 
+        /* Botones de rangos predefinidos */
+        .range-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-range {
+            background: white;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-range:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .modulos-grid {
@@ -815,30 +838,6 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 width: 100%;
             }
         }
-
-        /* Botones de rangos predefinidos */
-        .range-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-range {
-            background: white;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-range:hover {
-            background: var(--primary-color);
-            color: white;
-        }
     </style>
 </head>
 
@@ -851,7 +850,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                     <div class="navbar nav_title" style="border: 0;">
                         <a href="../../dashboard.php" class="site_title">
                             <img src="../../img/logo.png" alt="RANSA Logo" style="height: 32px;">
-                            <span style="font-size: 12px;"><?php echo $accion; ?> Factura</span>
+                            <span style="font-size: 12px;"><?php echo $factura_id > 0 ? 'Actualizar' : 'Nueva'; ?> Factura</span>
                         </a>
                     </div>
                     <div class="clearfix"></div>
@@ -918,7 +917,9 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 <!-- Info de factura -->
                 <div class="factura-info">
                     <span class="badge">Factura # FAC-<?php echo str_pad($factura_id, 6, '0', STR_PAD_LEFT); ?></span>
-                    <span><i class="fa fa-cube"></i> Módulo activo: <strong class="modulo-activo"><?php echo $modulo_nombre; ?></strong></span>
+                    <?php if (!empty($modulo_activo)): ?>
+                        <span><i class="fa fa-cube"></i> Módulo activo: <strong class="modulo-activo"><?php echo $modulo_nombre; ?></strong></span>
+                    <?php endif; ?>
                     <span><i class="fa fa-check-circle text-success"></i> Módulos completados: <?php echo count($modulos_completados); ?>/4</span>
                 </div>
                 <?php endif; ?>
@@ -1074,7 +1075,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                     </div>
                     <?php endif; ?>
 
-                    <!-- MÓDULO 3: OTROS SERVICIOS (ACTUALIZADO) -->
+                    <!-- MÓDULO 3: OTROS SERVICIOS -->
                     <?php if (debeMostrarModulo('paquete', $modulo_activo, $modulos_completados)): ?>
                     <div class="modulo-card <?php echo in_array('paquete', $modulos_completados) && $modulo_activo != 'paquete' ? 'completado' : ''; ?>" id="modulo-paquete">
                         <div class="modulo-header">
@@ -1118,7 +1119,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                     </div>
                     <?php endif; ?>
 
-                    <!-- MÓDULO 4: ALMACENAMIENTO (Ocupabilidad) -->
+                    <!-- MÓDULO 4: OCUPABILIDAD (antes Almacenamiento) -->
                     <?php if (debeMostrarModulo('almacen', $modulo_activo, $modulos_completados)): ?>
                     <div class="modulo-card <?php echo in_array('almacen', $modulos_completados) && $modulo_activo != 'almacen' ? 'completado' : ''; ?>" id="modulo-almacen">
                         <div class="modulo-header">
@@ -1127,7 +1128,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                             </div>
                             <div class="modulo-titulo">
                                 <h3>Módulo de Ocupabilidad</h3>
-                                <p>Archivo Excel con información de almacenes</p>
+                                <p>Gestión de posiciones de rack y ubicaciones</p>
                             </div>
                             <?php if (in_array('almacen', $modulos_completados) && $modulo_activo != 'almacen'): ?>
                                 <span class="badge-completado"><i class="fa fa-check"></i> Completado</span>
@@ -1135,50 +1136,28 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                         </div>
                         
                         <?php if (!in_array('almacen', $modulos_completados) || $modulo_activo == 'almacen'): ?>
-                        <div class="upload-area" onclick="document.getElementById('file-almacen').click()">
-                            <i class="fa fa-cloud-upload"></i>
-                            <p>Haz clic para seleccionar archivo</p>
-                            <small>Formatos: .xls, .xlsx, .csv (Max: 100MB)</small>
-                            <input type="file" id="file-almacen" name="archivo_almacen" style="display: none;" accept=".xls,.xlsx,.csv" onchange="habilitarBotonProcesar('almacen')">
-                        </div>
-
-                        <div class="file-info" id="info-almacen" style="display: none;">
-                            <div class="file-details">
-                                <i class="fa fa-file-excel-o"></i>
-                                <div>
-                                    <div class="file-name" id="nombre-almacen"></div>
-                                    <div class="file-size" id="size-almacen"></div>
-                                </div>
-                            </div>
-                            <button class="btn-remove" onclick="eliminarArchivo('almacen')">
-                                <i class="fa fa-times"></i>
-                            </button>
+                        <div class="upload-area" onclick="abrirModalOcupabilidad()">
+                            <i class="fa fa-cubes"></i>
+                            <p>Haz clic para gestionar ubicaciones</p>
+                            <small>Configura posiciones de rack y cantidades</small>
                         </div>
 
                         <div class="data-extracted" id="data-almacen" style="display: none;">
-                            <h4><i class="fa fa-database"></i> Datos Extraídos</h4>
+                            <h4><i class="fa fa-database"></i> Resumen de Ocupabilidad</h4>
                             <div class="data-grid">
                                 <div class="data-item">
-                                    <span class="label">Total Productos</span>
+                                    <span class="label">Total Ubicaciones</span>
                                     <span class="value" id="almacen-total">-</span>
                                 </div>
                                 <div class="data-item">
-                                    <span class="label">Ubicaciones</span>
+                                    <span class="label">Posiciones rack</span>
                                     <span class="value" id="almacen-ubicaciones">-</span>
-                                </div>
-                                <div class="data-item">
-                                    <span class="label">Stock Total</span>
-                                    <span class="value" id="almacen-stock">-</span>
-                                </div>
-                                <div class="data-item">
-                                    <span class="label">Valor Inventario</span>
-                                    <span class="value" id="almacen-valor">-</span>
                                 </div>
                             </div>
                         </div>
 
-                        <button class="btn-procesar-modulo" id="btn-procesar-almacen" onclick="mostrarVistaPrevia('almacen')" disabled>
-                            <i class="fa fa-cogs"></i> Procesar Archivo
+                        <button class="btn-procesar-modulo" id="btn-procesar-almacen" onclick="abrirModalOcupabilidad()" style="background: #17a2b8;">
+                            <i class="fa fa-cogs"></i> Gestionar Ocupabilidad
                         </button>
                         <?php endif; ?>
                     </div>
@@ -1200,7 +1179,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
         </div>
     </div>
 
-    <!-- MODAL DE VISTA PREVIA -->
+    <!-- MODAL DE VISTA PREVIA (para recepción/despacho) -->
     <div class="modal fade" id="modalVistaPrevia" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
@@ -1214,7 +1193,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- SECCIÓN DE FILTROS DE FECHA (AHORA PARA RECEPCIÓN Y DESPACHO) -->
+                    <!-- SECCIÓN DE FILTROS DE FECHA -->
                     <div class="filter-section" id="filterSection" style="display: none;">
                         <h5 id="filterTitle"><i class="fa fa-calendar"></i> Filtrar por fecha</h5>
                         <div class="filter-controls">
@@ -1308,19 +1287,43 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
         </div>
     </div>
 
+    <!-- MODAL DE OTROS SERVICIOS -->
+    <?php include 'otros-servicios-modal.php'; ?>
+
+    <!-- MODAL DE OCUPABILIDAD -->
+    <?php include 'ocupabilidad-modal.php'; ?>
+
     <!-- SCRIPTS -->
     <script src="../../vendors/jquery/dist/jquery.min.js"></script>
     <script src="../../vendors/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../../build/js/custom.min.js"></script>
+    <!-- <script src="../../build/js/custom.min.js"></script> -->
+     <!-- En lugar de custom.min.js, usa estos scripts -->
+<script src="../../vendors/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../../vendors/fastclick/lib/fastclick.js"></script>
+<script src="../../vendors/nprogress/nprogress.js"></script>
+<script src="../../build/js/custom.js"></script>
+
+    <!-- Variables globales para JavaScript -->
+    <script>
+        // Pasar variables de PHP a JavaScript
+        var facturaIdGlobal = <?php echo isset($factura_id) && $factura_id > 0 ? $factura_id : 'null'; ?>;
+        var codigoClienteGlobal = '<?php echo $codigo_cliente; ?>';
+        var totalModulosGlobal = <?php echo empty($modulo_activo) ? 4 : 1; ?>;
+        var moduloActivoGlobal = '<?php echo $modulo_activo; ?>';
+    </script>
+
+    <!-- Scripts de módulos -->
+    <script src="ocupabilidad.js"></script>
+    <script src="otros-servicios.js"></script>
 
     <script>
         // Variables globales
         let archivosSubidos = 0;
         let archivosProcesados = 0;
-        const totalModulos = <?php echo empty($modulo_activo) ? '4' : '1'; ?>;
+        const totalModulos = totalModulosGlobal;
         let moduloActual = '';
         let datosProcesados = {
-            factura_id: <?php echo $factura_id ?: 'null'; ?>
+            factura_id: facturaIdGlobal
         };
         let filtrosActuales = {
             fecha_desde: '',
@@ -1382,6 +1385,8 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             $('body').append(modalHtml);
             $(`#${modalId}`).modal('show');
             
+            const startTime = Date.now();
+            
             return {
                 id: modalId,
                 actualizar: function(porcentaje, mensaje, actual = null) {
@@ -1431,8 +1436,11 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             const hace30Dias = new Date();
             hace30Dias.setDate(hoy.getDate() - 30);
             
-            document.getElementById('filtro-fecha-desde').value = formatFechaInput(hace30Dias);
-            document.getElementById('filtro-fecha-hasta').value = formatFechaInput(hoy);
+            const fechaDesde = document.getElementById('filtro-fecha-desde');
+            const fechaHasta = document.getElementById('filtro-fecha-hasta');
+            
+            if (fechaDesde) fechaDesde.value = formatFechaInput(hace30Dias);
+            if (fechaHasta) fechaHasta.value = formatFechaInput(hoy);
         });
 
         function setRango(rango) {
@@ -1470,8 +1478,11 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                     break;
             }
             
-            document.getElementById('filtro-fecha-desde').value = formatFechaInput(fechaDesde);
-            document.getElementById('filtro-fecha-hasta').value = formatFechaInput(fechaHasta);
+            const fechaDesdeInput = document.getElementById('filtro-fecha-desde');
+            const fechaHastaInput = document.getElementById('filtro-fecha-hasta');
+            
+            if (fechaDesdeInput) fechaDesdeInput.value = formatFechaInput(fechaDesde);
+            if (fechaHastaInput) fechaHastaInput.value = formatFechaInput(fechaHasta);
             aplicarFiltroFecha();
         }
 
@@ -1480,16 +1491,6 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
-        }
-
-        function formatFechaConHora(fecha, tipo = 'inicio') {
-            if (!fecha) return '';
-            if (fecha.includes(' ')) return fecha;
-            if (tipo === 'inicio') {
-                return `${fecha} 00:00:00`;
-            } else {
-                return `${fecha} 23:59:59`;
-            }
         }
 
         function verificarApiPython() {
@@ -1571,7 +1572,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             const fileInput = document.getElementById(`file-${tipo}`);
             const btnProcesar = document.getElementById(`btn-procesar-${tipo}`);
             
-            if (fileInput.files.length > 0) {
+            if (fileInput && fileInput.files.length > 0) {
                 btnProcesar.disabled = false;
                 btnProcesar.classList.add('active');
                 mostrarInfoArchivo(tipo);
@@ -1595,22 +1596,32 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 return;
             }
 
-            document.getElementById(`nombre-${tipo}`).textContent = file.name.length > 30 ? 
+            const nombreEl = document.getElementById(`nombre-${tipo}`);
+            const sizeEl = document.getElementById(`size-${tipo}`);
+            const infoEl = document.getElementById(`info-${tipo}`);
+            
+            if (nombreEl) nombreEl.textContent = file.name.length > 30 ? 
                 file.name.substring(0, 30) + '...' : file.name;
-            document.getElementById(`size-${tipo}`).textContent = (file.size / 1024).toFixed(2) + ' KB';
-            document.getElementById(`info-${tipo}`).style.display = 'flex';
+            if (sizeEl) sizeEl.textContent = (file.size / 1024).toFixed(2) + ' KB';
+            if (infoEl) infoEl.style.display = 'flex';
 
             actualizarContador();
         }
 
         function eliminarArchivo(tipo) {
-            document.getElementById(`file-${tipo}`).value = '';
-            document.getElementById(`info-${tipo}`).style.display = 'none';
-            document.getElementById(`data-${tipo}`).style.display = 'none';
-            
+            const fileInput = document.getElementById(`file-${tipo}`);
+            const infoEl = document.getElementById(`info-${tipo}`);
+            const dataEl = document.getElementById(`data-${tipo}`);
             const btnProcesar = document.getElementById(`btn-procesar-${tipo}`);
-            btnProcesar.disabled = true;
-            btnProcesar.classList.remove('active');
+            
+            if (fileInput) fileInput.value = '';
+            if (infoEl) infoEl.style.display = 'none';
+            if (dataEl) dataEl.style.display = 'none';
+            
+            if (btnProcesar) {
+                btnProcesar.disabled = true;
+                btnProcesar.classList.remove('active');
+            }
             
             actualizarContador();
         }
@@ -1626,16 +1637,20 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 }
             });
 
-            document.getElementById('archivosSubidos').textContent = archivosSubidos;
-            document.getElementById('archivosProcesados').textContent = archivosProcesados;
+            const archivosSubidosEl = document.getElementById('archivosSubidos');
+            const archivosProcesadosEl = document.getElementById('archivosProcesados');
+            const progressFill = document.getElementById('progressFill');
+            
+            if (archivosSubidosEl) archivosSubidosEl.textContent = archivosSubidos;
+            if (archivosProcesadosEl) archivosProcesadosEl.textContent = archivosProcesados;
             
             const porcentaje = ((archivosSubidos + archivosProcesados) / (totalModulos * 2)) * 100;
-            document.getElementById('progressFill').style.width = porcentaje + '%';
+            if (progressFill) progressFill.style.width = porcentaje + '%';
         }
 
         function aplicarFiltroFecha() {
-            const fechaDesde = document.getElementById('filtro-fecha-desde').value;
-            const fechaHasta = document.getElementById('filtro-fecha-hasta').value;
+            const fechaDesde = document.getElementById('filtro-fecha-desde')?.value || '';
+            const fechaHasta = document.getElementById('filtro-fecha-hasta')?.value || '';
             
             if (fechaDesde && fechaHasta && fechaDesde > fechaHasta) {
                 mostrarNotificacion('La fecha "desde" no puede ser mayor que la fecha "hasta"', 'warning');
@@ -1646,15 +1661,23 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             filtrosActuales.fecha_hasta = fechaHasta;
             
             console.log('Filtros aplicados:', filtrosActuales);
-            mostrarVistaPrevia(moduloActual);
+            if (moduloActual) {
+                mostrarVistaPrevia(moduloActual);
+            }
         }
 
         function limpiarFiltroFecha() {
-            document.getElementById('filtro-fecha-desde').value = '';
-            document.getElementById('filtro-fecha-hasta').value = '';
+            const fechaDesde = document.getElementById('filtro-fecha-desde');
+            const fechaHasta = document.getElementById('filtro-fecha-hasta');
+            
+            if (fechaDesde) fechaDesde.value = '';
+            if (fechaHasta) fechaHasta.value = '';
             filtrosActuales.fecha_desde = '';
             filtrosActuales.fecha_hasta = '';
-            mostrarVistaPrevia(moduloActual);
+            
+            if (moduloActual) {
+                mostrarVistaPrevia(moduloActual);
+            }
         }
 
         function actualizarInfoRangoFechas(stats) {
@@ -1667,7 +1690,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 rangoMax.textContent = stats.fecha_max || 'No disponible';
             }
             
-            if (filterStats) {
+            if (filterStats && stats) {
                 let statsHtml = '';
                 if (stats.filas_filtradas_cantidad > 0) {
                     statsHtml += `<span class="filter-stat-badge"><i class="fa fa-filter"></i> ${stats.filas_filtradas_cantidad} filtrados por cantidad cero</span>`;
@@ -1695,7 +1718,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             }
         }
 
-        // Función para mostrar vista previa con Python (AHORA CON FILTROS PARA DESPACHO)
+        // Función para mostrar vista previa con Python
         function mostrarVistaPrevia(tipo) {
             moduloActual = tipo;
             
@@ -1714,34 +1737,38 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             
             const titulos = {
                 despacho: 'Despachos',
-                recepcion: 'Recepciones',
-                paquete: 'Otros Servicios',
-                almacen: 'Ocupabilidad'
+                recepcion: 'Recepciones'
             };
             
-            document.getElementById('modal-titulo-modulo').textContent = titulos[tipo];
+            const modalTitulo = document.getElementById('modal-titulo-modulo');
+            if (modalTitulo) modalTitulo.textContent = titulos[tipo] || tipo;
             
-            // ===== NUEVO: Mostrar filtros para DESPACHO también =====
+            // Mostrar filtros para recepción y despacho
             const filterSection = document.getElementById('filterSection');
             const filterTitle = document.getElementById('filterTitle');
             
-            if (tipo === 'recepcion') {
-                filterSection.style.display = 'block';
-                filterTitle.innerHTML = '<i class="fa fa-calendar"></i> Filtrar por fecha de recepción';
-            } else if (tipo === 'despacho') {
-                filterSection.style.display = 'block';
-                filterTitle.innerHTML = '<i class="fa fa-calendar"></i> Filtrar por fecha de despacho';
-            } else {
-                filterSection.style.display = 'none';
+            if (filterSection && filterTitle) {
+                if (tipo === 'recepcion' || tipo === 'despacho') {
+                    filterSection.style.display = 'block';
+                    filterTitle.innerHTML = `<i class="fa fa-calendar"></i> Filtrar por fecha de ${tipo === 'recepcion' ? 'recepción' : 'despacho'}`;
+                } else {
+                    filterSection.style.display = 'none';
+                }
             }
             
-            document.getElementById('preview-body').innerHTML = 
-                '<tr><td colspan="20" class="text-center">' +
-                '<i class="fa fa-spinner fa-spin fa-3x"></i><br><br>' +
-                'Procesando archivo con Python (esto puede tomar unos segundos para archivos grandes)...' +
-                '</td></tr>';
-            document.getElementById('preview-header').innerHTML = '';
-            document.getElementById('btn-confirmar').disabled = true;
+            const previewBody = document.getElementById('preview-body');
+            const previewHeader = document.getElementById('preview-header');
+            const btnConfirmar = document.getElementById('btn-confirmar');
+            
+            if (previewBody) {
+                previewBody.innerHTML = 
+                    '<tr><td colspan="20" class="text-center">' +
+                    '<i class="fa fa-spinner fa-spin fa-3x"></i><br><br>' +
+                    'Procesando archivo con Python (esto puede tomar unos segundos para archivos grandes)...' +
+                    '</td></tr>';
+            }
+            if (previewHeader) previewHeader.innerHTML = '';
+            if (btnConfirmar) btnConfirmar.disabled = true;
             
             $('#modalVistaPrevia').modal('show');
             
@@ -1764,7 +1791,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             } else if (tipo === 'despacho') {
                 controllerUrl = '../../controller/arcor/despacho_python.php';
             } else {
-                mostrarNotificacion('El módulo de ' + titulos[tipo] + ' estará disponible próximamente', 'info');
+                mostrarNotificacion('El módulo de ' + (titulos[tipo] || tipo) + ' estará disponible próximamente', 'info');
                 $('#modalVistaPrevia').modal('hide');
                 return;
             }
@@ -1817,7 +1844,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 
                 generarTablaPreview(tipo, data);
                 
-                document.getElementById('btn-confirmar').disabled = false;
+                if (btnConfirmar) btnConfirmar.disabled = false;
                 
                 const tiempoTotal = data.metadata ? data.metadata.tiempo_procesamiento : elapsed;
                 
@@ -1853,40 +1880,42 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
             const body = document.getElementById('preview-body');
             const summary = document.getElementById('previewSummary');
             
-            header.innerHTML = '';
-            body.innerHTML = '';
+            if (header) header.innerHTML = '';
+            if (body) body.innerHTML = '';
             
             const headers = data.headers || [];
             
-            headers.forEach(col => {
-                const th = document.createElement('th');
-                th.textContent = col || 'Columna';
-                
-                const friendlyNames = {
-                    'RECEIPTKEY': 'N° de Recepción',
-                    'SKU': 'Código Artículo',
-                    'STORERKEY': 'Propietario',
-                    'UNIDADES': 'Unidades',
-                    'CAJAS': 'Cajas',
-                    'PALLETS': 'Pallets',
-                    'STATUS': 'Estado',
-                    'DATERECEIVED': 'Fecha Recepción',
-                    'EXTERNRECEIPTKEY': 'ASN Externo',
-                    'TYPE': 'Tipo',
-                    'ORDERKEY': 'N° de Orden',
-                    'EXTERNORDERKEY': 'Orden Externa',
-                    'ADDDATE': 'Fecha Despacho'
-                };
-                
-                if (friendlyNames[col]) {
-                    th.setAttribute('title', friendlyNames[col]);
-                    th.style.cursor = 'help';
-                }
-                
-                header.appendChild(th);
-            });
+            if (header) {
+                headers.forEach(col => {
+                    const th = document.createElement('th');
+                    th.textContent = col || 'Columna';
+                    
+                    const friendlyNames = {
+                        'RECEIPTKEY': 'N° de Recepción',
+                        'SKU': 'Código Artículo',
+                        'STORERKEY': 'Propietario',
+                        'UNIDADES': 'Unidades',
+                        'CAJAS': 'Cajas',
+                        'PALLETS': 'Pallets',
+                        'STATUS': 'Estado',
+                        'DATERECEIVED': 'Fecha Recepción',
+                        'EXTERNRECEIPTKEY': 'ASN Externo',
+                        'TYPE': 'Tipo',
+                        'ORDERKEY': 'N° de Orden',
+                        'EXTERNORDERKEY': 'Orden Externa',
+                        'ADDDATE': 'Fecha Despacho'
+                    };
+                    
+                    if (friendlyNames[col]) {
+                        th.setAttribute('title', friendlyNames[col]);
+                        th.style.cursor = 'help';
+                    }
+                    
+                    header.appendChild(th);
+                });
+            }
             
-            if (data.data && data.data.length > 0) {
+            if (body && data.data && data.data.length > 0) {
                 data.data.forEach((row) => {
                     const tr = document.createElement('tr');
                     
@@ -1928,7 +1957,7 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                     infoRow.appendChild(infoCell);
                     body.appendChild(infoRow);
                 }
-            } else {
+            } else if (body) {
                 const tr = document.createElement('tr');
                 const td = document.createElement('td');
                 td.colSpan = headers.length || 1;
@@ -1938,9 +1967,10 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 body.appendChild(tr);
             }
             
-            document.getElementById('total-registros').textContent = data.total_registros || 0;
+            const totalRegistros = document.getElementById('total-registros');
+            if (totalRegistros) totalRegistros.textContent = data.total_registros || 0;
             
-            if (data.stats) {
+            if (summary && data.stats) {
                 const existingStats = document.getElementById('extra-stats');
                 if (existingStats) {
                     existingStats.remove();
@@ -1998,32 +2028,45 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
 
         function actualizarEstadisticasModulo(tipo, stats) {
             if (tipo === 'recepcion') {
-                document.getElementById('recepcion-total').textContent = stats.total_filas || 0;
+                const recepcionTotal = document.getElementById('recepcion-total');
+                const recepcionBultos = document.getElementById('recepcion-bultos');
+                const recepcionProveedores = document.getElementById('recepcion-proveedores');
+                const recepcionFecha = document.getElementById('recepcion-fecha');
                 
-                if (stats.receiptkeys_unicos) {
-                    document.getElementById('recepcion-bultos').textContent = stats.receiptkeys_unicos;
+                if (recepcionTotal) recepcionTotal.textContent = stats.total_filas || 0;
+                
+                if (recepcionBultos && stats.receiptkeys_unicos) {
+                    recepcionBultos.textContent = stats.receiptkeys_unicos;
                 }
                 
-                let totales = [];
-                if (stats.total_unidades && stats.total_unidades !== '0') totales.push(`${stats.total_unidades} Unid`);
-                if (stats.total_cajas && stats.total_cajas !== '0') totales.push(`${stats.total_cajas} Cjas`);
-                if (stats.total_pallets && stats.total_pallets !== '0') totales.push(`${stats.total_pallets} Pallets`);
+                if (recepcionProveedores) {
+                    let totales = [];
+                    if (stats.total_unidades && stats.total_unidades !== '0') totales.push(`${stats.total_unidades} Unid`);
+                    if (stats.total_cajas && stats.total_cajas !== '0') totales.push(`${stats.total_cajas} Cjas`);
+                    if (stats.total_pallets && stats.total_pallets !== '0') totales.push(`${stats.total_pallets} Pallets`);
+                    
+                    recepcionProveedores.textContent = totales.join(' + ') || '0';
+                }
                 
-                document.getElementById('recepcion-proveedores').textContent = totales.join(' + ') || '0';
-                
-                if (stats.fecha_min && stats.fecha_max) {
-                    document.getElementById('recepcion-fecha').textContent = 
-                        `${stats.fecha_min} - ${stats.fecha_max}`;
-                } else {
-                    document.getElementById('recepcion-fecha').textContent = 'No disponible';
+                if (recepcionFecha && stats.fecha_min && stats.fecha_max) {
+                    recepcionFecha.textContent = `${stats.fecha_min} - ${stats.fecha_max}`;
+                } else if (recepcionFecha) {
+                    recepcionFecha.textContent = 'No disponible';
                 }
             } else if (tipo === 'despacho') {
-                document.getElementById('despacho-total').textContent = stats.total_filas || 0;
-                document.getElementById('despacho-peso').textContent = stats.total_unidades || '0';
+                const despachoTotal = document.getElementById('despacho-total');
+                const despachoPeso = document.getElementById('despacho-peso');
+                const despachoFechaIni = document.getElementById('despacho-fecha-ini');
+                const despachoFechaFin = document.getElementById('despacho-fecha-fin');
                 
-                if (stats.fecha_min && stats.fecha_max) {
-                    document.getElementById('despacho-fecha-ini').textContent = stats.fecha_min;
-                    document.getElementById('despacho-fecha-fin').textContent = stats.fecha_max;
+                if (despachoTotal) despachoTotal.textContent = stats.total_filas || 0;
+                if (despachoPeso) despachoPeso.textContent = stats.total_unidades || '0';
+                
+                if (despachoFechaIni && stats.fecha_min) {
+                    despachoFechaIni.textContent = stats.fecha_min;
+                }
+                if (despachoFechaFin && stats.fecha_max) {
+                    despachoFechaFin.textContent = stats.fecha_max;
                 }
             }
             
@@ -2035,14 +2078,18 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
 
         function confirmarProcesamiento() {
             archivosProcesados++;
-            document.getElementById('archivosProcesados').textContent = archivosProcesados;
+            const archivosProcesadosEl = document.getElementById('archivosProcesados');
+            if (archivosProcesadosEl) archivosProcesadosEl.textContent = archivosProcesados;
             
             const btnProcesar = document.getElementById(`btn-procesar-${moduloActual}`);
-            btnProcesar.disabled = true;
-            btnProcesar.classList.remove('active');
-            btnProcesar.innerHTML = '<i class="fa fa-check"></i> Procesado';
+            if (btnProcesar) {
+                btnProcesar.disabled = true;
+                btnProcesar.classList.remove('active');
+                btnProcesar.innerHTML = '<i class="fa fa-check"></i> Procesado';
+            }
             
-            document.getElementById(`file-${moduloActual}`).disabled = true;
+            const fileInput = document.getElementById(`file-${moduloActual}`);
+            if (fileInput) fileInput.disabled = true;
             
             const uploadArea = document.querySelector(`#modulo-${moduloActual} .upload-area`);
             if (uploadArea) {
@@ -2080,9 +2127,6 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
                 guardarDatosRecepcion(datosProcesados['factura_id']);
             } else if (moduloActual === 'despacho') {
                 guardarDatosDespacho(datosProcesados['factura_id']);
-            } else if (moduloActual === 'paquete') {
-                // Los otros servicios se guardan directamente desde el modal
-                mostrarNotificacion('Servicios guardados correctamente', 'success');
             }
             
             filtrosActuales = { fecha_desde: '', fecha_hasta: '' };
@@ -2122,8 +2166,8 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
 
             const datosAGuardar = {
                 factura_id: factura_id,
-                cliente_codigo: '<?php echo $codigo_cliente; ?>',
-                cliente_id: '<?php echo $cliente_info['id'] ?? 0; ?>',
+                cliente_codigo: codigoClienteGlobal,
+                cliente_id: <?php echo isset($cliente_info['id']) ? $cliente_info['id'] : 0; ?>,
                 archivo_nombre: document.getElementById(`nombre-${modulo}`)?.textContent || 'archivo.xlsx',
                 total_registros: data.total_registros,
                 datos: data.data_completa.map(row => {
@@ -2210,15 +2254,9 @@ function debeMostrarModulo($modulo, $modulo_activo, $modulos_completados) {
         }
 
         // Toggle del menú
-        document.getElementById('menu_toggle').addEventListener('click', function() {
-            document.querySelector('.left_col').classList.toggle('menu-open');
+        document.getElementById('menu_toggle')?.addEventListener('click', function() {
+            document.querySelector('.left_col')?.classList.toggle('menu-open');
         });
     </script>
-
-    <!-- MODAL DE OTROS SERVICIOS -->
-    <?php include 'otros-servicios-modal.php'; ?>
-
-    <!-- SCRIPT DE OTROS SERVICIOS -->
-    <script src="otros-servicios.js"></script>
 </body>
 </html>

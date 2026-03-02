@@ -10,13 +10,13 @@ define('DB_PASS', 'ChaosSoldier01');
 // Configuración de entorno
 define('ENVIRONMENT', 'development'); // 'development' o 'production'
 
-// Definiciones de tablas (NUEVO)
-define('TABLA_FACTURAS', '[FacBol].[facturas_cabecera]');
+// Definiciones de tablas - UNA SOLA VEZ CADA UNA
+define('TABLA_FACTURAS', 'DPL.FacBol.facturas_cabecera');
 define('TABLA_RECEPCION', '[FacBol].[facturas_recepcion_detalle]');
 define('TABLA_DESPACHO', '[FacBol].[facturas_despacho_detalle]');
 define('TABLA_PAQUETE', '[FacBol].[facturas_paquete_detalle]');
 define('TABLA_ALMACEN', '[FacBol].[facturas_almacen_detalle]');
-define('TABLA_CLIENTES', '[FacBol].[clientes]'); // Por si la necesitas
+define('TABLA_CLIENTES', '[FacBol].[clientes]');
 
 if (ENVIRONMENT === 'development') {
     ini_set('display_errors', 1);

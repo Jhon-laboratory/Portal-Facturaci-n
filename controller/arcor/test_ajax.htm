@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test AJAX</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Test AJAX Guardar</h2>
+    
+    <button onclick="testGuardar()">Probar Guardar</button>
+    
+    <div id="resultado" style="margin-top:20px; padding:10px; border:1px solid #ccc;"></div>
+
+    <script>
+    function testGuardar() {
+        $('#resultado').html('Enviando...');
+        
+        $.ajax({
+            url: 'guardar_ocupabilidad.php',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                factura_id: 2,
+                ubicaciones: [
+                    {tipo: 'Posiciones rack', cantidad: 5},
+                    {tipo: 'Posiciones rack (pallet adicional)', cantidad: 3}
+                ]
+            }),
+            success: function(response) {
+                $('#resultado').html('<pre>✅ Éxito: ' + JSON.stringify(response, null, 2) + '</pre>');
+            },
+            error: function(xhr, status, error) {
+                $('#resultado').html('<pre>❌ Error: ' + status + '\n' + xhr.responseText + '</pre>');
+            }
+        });
+    }
+    </script>
+</body>
+</html>

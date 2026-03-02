@@ -1,0 +1,145 @@
+## 📋 **RESUMEN PARA TU SERVIDOR - TODO LO QUE DEBE ESTAR ACTIVO**
+
+### **1. SERVICIOS PRINCIPALES (SIEMPRE CORRIENDO)**
+
+```bash
+# APACHE (servidor web)
+sudo systemctl status apache2
+● apache2.service - The Apache HTTP Server
+   Active: active (running)
+
+# MYSQL (base de datos)
+sudo systemctl status mysql
+● mysql.service - MySQL Community Server
+   Active: active (running)
+
+# API PYTHON (procesador de Excel) - ¡LA MÁS IMPORTANTE!
+sudo systemctl status ranza-factura-api.service
+● ranza-factura-api.service - API Python para procesamiento de Excel
+   Active: active (running)
+   Enabled: enabled (arranca con el sistema)
+```
+
+### **2. ARCHIVOS CRÍTICOS QUE DEBEN EXISTIR**
+
+```bash
+# Verificar que existen estos archivos:
+
+ls -la /var/www/html/Portal-Facturaci-n/controller/python_bridge.php
+ls -la /var/www/html/Portal-Facturaci-n/controller/arcor/recepcion_python.php
+ls -la /var/www/html/Portal-Facturaci-n/controller/arcor/check_python_api.php
+ls -la /var/www/html/Portal-Facturaci-n/api_python/app.py
+```
+
+### **3. DIRECTORIOS CON PERMISOS CORRECTOS**
+
+```bash
+# Directorio temporal compartido (PHP + Python)
+ls -la /var/www/html/Portal-Facturaci-n/temp_uploads/
+# Debe tener permisos 777 y ser propiedad de nodeadmin:www-data
+
+# Archivo de log del bridge
+ls -la /var/www/html/Portal-Facturaci-n/controller/python_bridge.log
+# Debe tener permisos 666
+```
+
+### **4. PUERTOS ESCUCHANDO**
+
+```bash
+# Verificar que el puerto 5000 está en uso (API Python)
+sudo netstat -tlnp | grep 5000
+# Debe mostrar: 127.0.0.1:5000 con proceso gunicorn/python
+
+# Verificar puerto 80 (Apache)
+sudo netstat -tlnp | grep :80
+```
+
+### **5. CONEXIONES QUE DEBEN FUNCIONAR**
+
+```bash
+# Desde el servidor (PHP → API Python)
+curl http://127.0.0.1:5000/health
+# Debe responder: {"status":"ok",...}
+
+# Desde el navegador (usuario → PHP)
+curl http://9.234.192.192/Portal-Facturaci-n/controller/arcor/check_python_api.php
+# Debe responder: {"success":true,"message":"API disponible",...}
+```
+
+### **6. COMANDOS DE VERIFICACIÓN RÁPIDA**
+
+```bash
+# Script de verificación todo-en-uno
+cat > ~/verificar.sh << 'EOF'
+#!/bin/bash
+echo "=== VERIFICACIÓN DEL SISTEMA ==="
+echo ""
+echo "1. SERVICIOS:"
+sudo systemctl status apache2 | grep Active
+sudo systemctl status mysql | grep Active
+sudo systemctl status ranza-factura-api.service | grep Active
+echo ""
+echo "2. PUERTO 5000:"
+sudo netstat -tlnp | grep 5000 || echo "❌ Puerto 5000 no escucha"
+echo ""
+echo "3. API PYTHON LOCAL:"
+curl -s http://127.0.0.1:5000/health | grep status || echo "❌ API no responde"
+echo ""
+echo "4. PROXY PHP:"
+curl -s http://9.234.192.192/Portal-Facturaci-n/controller/arcor/check_python_api.php
+echo ""
+echo "5. PERMISOS:"
+ls -ld /var/www/html/Portal-Facturaci-n/temp_uploads/
+ls -l /var/www/html/Portal-Facturaci-n/controller/python_bridge.log
+EOF
+
+chmod +x ~/verificar.sh
+./verificar.sh
+```
+
+### **7. LO QUE DEBE ESTAR HABILITADO (ENABLED)**
+
+```bash
+# Verificar que arrancan con el sistema
+sudo systemctl is-enabled apache2      # → enabled
+sudo systemctl is-enabled mysql        # → enabled
+sudo systemctl is-enabled ranza-factura-api.service  # → enabled
+```
+
+### **8. LOGS IMPORTANTES (DÓNDE MIRAR)**
+
+```bash
+# Log de Apache (errores PHP)
+sudo tail -f /var/log/apache2/error.log
+
+# Log de la API Python
+sudo journalctl -u ranza-factura-api.service -f
+
+# Log del bridge PHP-Python
+tail -f /var/www/html/Portal-Facturaci-n/controller/python_bridge.log
+```
+
+## 🎯 **RESUMEN: Lo mínimo que debe estar activo:**
+
+1. ✅ **Apache** - Servidor web
+2. ✅ **MySQL** - Base de datos  
+3. ✅ **API Python** - Puerto 5000 (servicio systemd)
+4. ✅ **PHP** - Con extensión curl habilitada
+5. ✅ **Permisos** - En temp_uploads/ y python_bridge.log
+6. ✅ **Archivos** - Todos los PHP en su lugar
+
+## ⚡ **COMANDO MÁGICO PARA REINICIAR TODO:**
+
+```bash
+# Si algo falla, reiniciar todo en orden
+sudo systemctl restart apache2
+sudo systemctl restart mysql
+sudo systemctl restart ranza-factura-api.service
+
+# Verificar que todo quedó bien
+sudo systemctl status apache2 --no-pager | head -3
+sudo systemctl status mysql --no-pager | head -3
+sudo systemctl status ranza-factura-api.service --no-pager | head -3
+```
+
+**¡Con esto tu servidor está 100% operativo!** 🚀

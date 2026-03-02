@@ -9,7 +9,6 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Incluir conexión
-//require_once 'conexion.php';
 require_once 'conexion/conexion.php';
 
 $error = '';
@@ -23,29 +22,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Por favor ingrese usuario y contraseña";
     } else {
         try {
-            // Determinar si es email o nombre de usuario
+            // Determinar si es email o nombre de usuario (SIN la columna activo)
             if (strpos($login, '@') !== false) {
-                $sql = "SELECT * FROM IT.usuarios_pt WHERE correo = ?";
+                $sql = "SELECT * FROM DPL.IT.usuarios_pt WHERE correo = ?";
             } else {
-                $sql = "SELECT * FROM IT.usuarios_pt WHERE nombre = ?";
+                $sql = "SELECT * FROM DPL.IT.usuarios_pt WHERE nombre = ?";
             }
             
             $stmt = $conn->prepare($sql);
             $stmt->execute([$login]);
-            $user = $stmt->fetch();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($user) {
-                // Verificar contraseña (asumiendo que está hasheada con password_hash)
+                // Verificar contraseña
                 if (password_verify($password, $user['contrasena'])) {
-                    // Guardar datos en sesión
-                    $_SESSION['user_id'] = $user['id'];
-                    $_SESSION['user_name'] = $user['nombre'];
-                    $_SESSION['user_email'] = $user['correo'];
-                    $_SESSION['user_type'] = $user['tipo_usuario'];
                     
-                    // Redirigir
-                    header('Location: dashboard.php');
-                    exit;
+                    // ============================================
+                    // OBTENER PERMISOS DEL USUARIO
+                    // ============================================
+                    $sql_permisos = "SELECT pu.*, c.nombre_comercial 
+                                     FROM [FacBol].[permisos_usuarios] pu
+                                     INNER JOIN [FacBol].[clientes] c ON pu.cliente_codigo = c.codigo_cliente
+                                     WHERE pu.usuario_id = ? AND pu.activo = 1";
+                    
+                    $stmt_permisos = $conn->prepare($sql_permisos);
+                    $stmt_permisos->execute([$user['id']]);
+                    $permisos = $stmt_permisos->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    if (empty($permisos)) {
+                        $error = "El usuario no tiene permisos asignados para ningún cliente";
+                    } else {
+                        // Determinar el rol máximo del usuario
+                        $tipos_usuario = array_column($permisos, 'tipo_usuario');
+                        $rol_maximo = min($tipos_usuario); // El número más bajo es el rol más alto (1=Admin)
+                        
+                        // Guardar datos básicos del usuario
+                        $_SESSION['user_id'] = $user['id'];
+                        $_SESSION['user_name'] = $user['nombre'];
+                        $_SESSION['user_email'] = $user['correo'];
+                        $_SESSION['user_rol'] = $rol_maximo;
+                        $_SESSION['user_rol_nombre'] = ($rol_maximo == 1) ? 'Administrador' : 
+                                                        (($rol_maximo == 2) ? 'Supervisor' : 'Verificador');
+                        
+                        // Guardar permisos por cliente
+                        $_SESSION['permisos_clientes'] = [];
+                        foreach ($permisos as $permiso) {
+                            $_SESSION['permisos_clientes'][$permiso['cliente_codigo']] = [
+                                'tipo_usuario' => $permiso['tipo_usuario'],
+                                'nombre_comercial' => $permiso['nombre_comercial']
+                            ];
+                        }
+                        
+                        // Guardar lista de clientes a los que tiene acceso
+                        $_SESSION['clientes_acceso'] = array_keys($_SESSION['permisos_clientes']);
+                        
+                        // Redirigir al dashboard
+                        header('Location: dashboard.php');
+                        exit;
+                    }
+                    
                 } else {
                     $error = "Contraseña incorrecta";
                 }
@@ -54,6 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } catch (PDOException $e) {
             $error = "Error en la base de datos: " . $e->getMessage();
+            error_log("Error en login: " . $e->getMessage());
         }
     }
 }

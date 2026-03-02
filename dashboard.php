@@ -12,7 +12,8 @@ if (!isset($_SESSION['user_id'])) {
 // Variables de sesión con valores por defecto
 $usuario_nombre = $_SESSION['user_name'] ?? 'Usuario';
 $usuario_correo = $_SESSION['user_email'] ?? '';
-$usuario_tipo = $_SESSION['user_type'] ?? 'usuario';
+$usuario_rol = $_SESSION['user_rol'] ?? 3;
+$usuario_rol_nombre = $_SESSION['user_rol_nombre'] ?? 'Verificador';
 $usuario_ciudad = $_SESSION['user_ciudad'] ?? 'N/A';
 $usuario_pais = $_SESSION['user_pais'] ?? 'N/A';
 $usuario_color = $_SESSION['user_color'] ?? '#009a3f';
@@ -20,42 +21,82 @@ $id_perfil = $_SESSION['id_perfil'] ?? 0;
 $user_area = $_SESSION['user_area'] ?? '';
 $user_subarea = $_SESSION['user_subarea'] ?? '';
 
-// Obtener datos adicionales del usuario (firma, cédula)
-$firma = '';
-$cedula = '';
+// Obtener la lista de clientes a los que tiene acceso
+$clientes_acceso = $_SESSION['clientes_acceso'] ?? [];
+$permisos_clientes = $_SESSION['permisos_clientes'] ?? [];
 
 // Mostrar mensaje si viene por parámetro
 $mensaje = isset($_GET['msg']) ? urldecode($_GET['msg']) : '';
 
-// Obtener clientes de la base de datos
+// Obtener clientes de la base de datos (solo los que tiene permiso)
 $clientes = [];
 $error_db = null;
 
 try {
     $conn = getDBConnection();
     
-    // Obtener datos adicionales del usuario
+    // Obtener datos adicionales del usuario (firma, cédula)
     $sql = "SELECT firma, cedula FROM IT.usuarios_pt WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$_SESSION['user_id']]);
     $user_data = $stmt->fetch();
     
-    if ($user_data) {
-        $firma = $user_data['firma'] ?? '';
-        $cedula = $user_data['cedula'] ?? '';
+    // Si no hay clientes en sesión, intentar cargarlos nuevamente
+    if (empty($clientes_acceso)) {
+        // Obtener permisos del usuario
+        $sql_permisos = "SELECT pu.*, c.nombre_comercial, c.logo_png 
+                         FROM [FacBol].[permisos_usuarios] pu
+                         INNER JOIN [FacBol].[clientes] c ON pu.cliente_codigo = c.codigo_cliente
+                         WHERE pu.usuario_id = ? AND pu.activo = 1
+                         ORDER BY c.nombre_comercial";
+        
+        $stmt_permisos = $conn->prepare($sql_permisos);
+        $stmt_permisos->execute([$_SESSION['user_id']]);
+        $permisos = $stmt_permisos->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (!empty($permisos)) {
+            // Reconstruir las variables de sesión
+            $clientes_acceso = [];
+            $permisos_clientes = [];
+            
+            foreach ($permisos as $permiso) {
+                $clientes_acceso[] = $permiso['cliente_codigo'];
+                $permisos_clientes[$permiso['cliente_codigo']] = [
+                    'tipo_usuario' => $permiso['tipo_usuario'],
+                    'nombre_comercial' => $permiso['nombre_comercial'],
+                    'logo_png' => $permiso['logo_png']
+                ];
+            }
+            
+            // Actualizar sesión
+            $_SESSION['clientes_acceso'] = $clientes_acceso;
+            $_SESSION['permisos_clientes'] = $permisos_clientes;
+        }
     }
     
-    // Obtener clientes - CORREGIDO: eliminada referencia a columna 'estado' que no existe
-    $query = "SELECT id, codigo_cliente, nombre_comercial, logo_png 
-              FROM [FacBol].[clientes] 
-              ORDER BY nombre_comercial";
-    
-    $stmt = $conn->query($query);
-    $clientes = $stmt->fetchAll();
+    // Construir la lista de clientes con la información completa
+    if (!empty($clientes_acceso)) {
+        // Crear placeholders para la consulta IN
+        $placeholders = implode(',', array_fill(0, count($clientes_acceso), '?'));
+        
+        $query = "SELECT id, codigo_cliente, nombre_comercial, logo_png 
+                  FROM [FacBol].[clientes] 
+                  WHERE codigo_cliente IN ($placeholders)
+                  ORDER BY nombre_comercial";
+        
+        $stmt = $conn->prepare($query);
+        $stmt->execute($clientes_acceso);
+        $clientes = $stmt->fetchAll();
+    }
     
 } catch (Exception $e) {
     $error_db = "Error de conexión: " . $e->getMessage();
     error_log("Error en dashboard: " . $e->getMessage());
+}
+
+// Si no hay clientes, mostrar mensaje
+if (empty($clientes) && empty($error_db)) {
+    $mensaje = "No tiene clientes asignados. Contacte al administrador.";
 }
 ?>
 <!DOCTYPE html>
@@ -94,10 +135,11 @@ try {
             margin-bottom: 25px;
             background: white;
             overflow: hidden;
-            height: 220px;
+            height: 250px;
             display: flex;
             flex-direction: column;
             cursor: pointer;
+            position: relative;
         }
         
         .client-card:hover {
@@ -132,6 +174,7 @@ try {
             text-align: center;
             flex: 1;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
@@ -140,11 +183,22 @@ try {
             font-size: 18px;
             font-weight: bold;
             color: #333;
-            margin: 0;
+            margin: 0 0 5px 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 100%;
+        }
+        
+        .rol-badge {
+            background: #e8f5e9;
+            color: #009a3f;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 5px;
         }
         
         /* Buscador */
@@ -201,20 +255,20 @@ try {
             word-break: break-word;
         }
         
-        .user-profile-card .user-detail {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 3px;
-            word-break: break-word;
-        }
-        
-        .user-badge {
+        .user-profile-card .user-rol {
             background: rgba(255,255,255,0.2);
             border-radius: 20px;
             padding: 5px 15px;
             font-size: 12px;
             display: inline-block;
             margin-top: 10px;
+        }
+        
+        .user-profile-card .user-detail {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 3px;
+            word-break: break-word;
         }
         
         /* Responsividad */
@@ -234,7 +288,7 @@ try {
             }
             
             .client-card {
-                height: 200px;
+                height: 230px;
             }
             
             .client-header {
@@ -268,10 +322,6 @@ try {
             .user-profile-card .user-name {
                 font-size: 16px;
             }
-            
-            .user-profile-card .user-detail {
-                font-size: 12px;
-            }
         }
 
         /* Estilo para el footer */
@@ -282,6 +332,22 @@ try {
             border-radius: 8px;
             font-size: 11px;
             border-top: 1px solid #e0e0e0;
+        }
+        
+        /* Badge de administrador */
+        .badge-admin {
+            background: #ffc107;
+            color: #856404;
+        }
+        
+        .badge-supervisor {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .badge-verificador {
+            background: #6c757d;
+            color: white;
         }
     </style>
 </head>
@@ -304,7 +370,12 @@ try {
                         <div class="user-name">
                             <i class="fa fa-user-circle"></i> <?php echo htmlspecialchars($usuario_nombre); ?>
                         </div>
-                        
+                        <div class="user-rol">
+                            <i class="fa fa-tag"></i> <?php echo htmlspecialchars($usuario_rol_nombre); ?>
+                        </div>
+                        <div class="user-detail">
+                            <i class="fa fa-envelope"></i> <?php echo htmlspecialchars($usuario_correo); ?>
+                        </div>
                     </div>
 
                     <!-- MENU -->
@@ -314,15 +385,6 @@ try {
                             <ul class="nav side-menu">
                                 <li class="active">
                                     <a href="dashboard.php"><i class="fa fa-dashboard"></i> Dashboard</a>
-                                </li>
-                                <li>
-                                    <a href="ingreso.php"><i class="fa fa-sign-in"></i> Ingreso</a>
-                                </li>
-                                <li>
-                                    <a href="translado.php"><i class="fa fa-exchange"></i> Traslado</a>
-                                </li>
-                                <li>
-                                    <a href="reportes.php"><i class="fa fa-file-text"></i> Reportes</a>
                                 </li>
                             </ul>
                         </div>
@@ -351,8 +413,8 @@ try {
                             <i class="fa fa-user-circle"></i> 
                             <?php echo htmlspecialchars($usuario_nombre); ?>
                             <small style="opacity: 0.8; margin-left: 10px;">
-                                <i class="fa fa-map-marker"></i> 
-                                <?php echo htmlspecialchars($usuario_ciudad); ?>
+                                <i class="fa fa-tag"></i> 
+                                <?php echo htmlspecialchars($usuario_rol_nombre); ?>
                             </small>
                         </span>
                     </div>
@@ -363,7 +425,8 @@ try {
             <div class="right_col" role="main">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3><i class="fa fa-building"></i> Clientes</h3>
+                        <h3><i class="fa fa-building"></i> Mis Clientes</h3>
+                        <small><?php echo count($clientes); ?> cliente(s) asignado(s)</small>
                     </div>
                     <div class="title_right">
                         <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
@@ -403,13 +466,20 @@ try {
                 <div class="row" id="clientesContainer">
                     <?php if (empty($clientes)): ?>
                         <div class="col-md-12">
-                            <div class="alert alert-info text-center">
-                                <i class="fa fa-info-circle fa-2x"></i>
-                                <p>No hay clientes activos registrados</p>
+                            <div class="alert alert-warning text-center">
+                                <i class="fa fa-exclamation-triangle fa-2x"></i>
+                                <p>No tiene clientes asignados. Contacte al administrador.</p>
                             </div>
                         </div>
                     <?php else: ?>
-                        <?php foreach ($clientes as $cliente): ?>
+                        <?php foreach ($clientes as $cliente): 
+                            $codigo = $cliente['codigo_cliente'];
+                            $tipo_acceso = $permisos_clientes[$codigo]['tipo_usuario'] ?? 3;
+                            $acceso_nombre = ($tipo_acceso == 1) ? 'Administrador' : 
+                                            (($tipo_acceso == 2) ? 'Supervisor' : 'Verificador');
+                            $badge_class = ($tipo_acceso == 1) ? 'badge-admin' : 
+                                          (($tipo_acceso == 2) ? 'badge-supervisor' : 'badge-verificador');
+                        ?>
                             <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 cliente-item" 
                                  data-nombre="<?php echo strtolower(htmlspecialchars($cliente['nombre_comercial'])); ?>"
                                  data-codigo="<?php echo strtolower(htmlspecialchars($cliente['codigo_cliente'])); ?>">
@@ -426,6 +496,9 @@ try {
                                         <div class="client-title" title="<?php echo htmlspecialchars($cliente['nombre_comercial']); ?>">
                                             <?php echo htmlspecialchars($cliente['nombre_comercial']); ?>
                                         </div>
+                                        <span class="rol-badge <?php echo $badge_class; ?>">
+                                            <i class="fa fa-tag"></i> <?php echo $acceso_nombre; ?>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -449,6 +522,7 @@ try {
                 <div class="pull-right">
                     <i class="fa fa-clock-o"></i>
                     Sistema Ransa Archivo - Bolivia | Usuario: <?php echo htmlspecialchars($usuario_nombre); ?> | 
+                    Rol: <?php echo htmlspecialchars($usuario_rol_nombre); ?> |
                     Fecha: <?php echo date('d/m/Y H:i:s'); ?>
                 </div>
                 <div class="clearfix"></div>
@@ -464,7 +538,7 @@ try {
     <script src="build/js/custom.min.js"></script>
 
     <script>
-        // Función para ver detalle del cliente - CORREGIDO: apunta a la ruta correcta
+        // Función para ver detalle del cliente
         function verCliente(codigoCliente) {
             if (codigoCliente) {
                 window.location.href = 'pages/arcor/index.php?cliente=' + encodeURIComponent(codigoCliente);
